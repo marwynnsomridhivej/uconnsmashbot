@@ -2,5 +2,6 @@
 /venv
 .env
 __pycache__
-.pyc
+*.pyc
 /cogs/__pycache__
+*.json
