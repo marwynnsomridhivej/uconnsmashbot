@@ -11,4 +11,4 @@ The files that will be created are as follows:
     - tags.json*
     - warns.json
 ```
-\**These files will be created when a specific command is executed for the first time. Is there a reason for this? That is a good question.*
+\**These files will be created when a specific command is executed for the first time. What I have implemented is a check to see if a file exists, if not, return an error message.*
