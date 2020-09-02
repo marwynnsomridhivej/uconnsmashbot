@@ -7,3 +7,6 @@ The bot's prefix is `?` and is not customisable, however, this may change at the
 ## Features
 The bot has some really neat features. Here is a complete list of them:
 *list is WIP, will update once features are finalised*
+
+## Contact
+**Discord: ** MS Arranges#3060
