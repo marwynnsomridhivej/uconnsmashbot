@@ -9,7 +9,9 @@ import re
 import discord
 from discord.ext import commands, tasks
 from dotenv import load_dotenv
-from globalcommands import GlobalCMDS as gcmds
+from globalcommands import GlobalCMDS
+
+gcmds = GlobalCMDS()
 
 DISABLED_COGS = ["Blackjack", 'Coinflip', 'Connectfour', 'Oldmaid', 'Slots', 'Uno',
                  'Reactions', 'Moderation', 'Music', 'Utility']
@@ -20,7 +22,7 @@ if os.path.exists('discord.log'):
     os.remove('discord.log')
 
 
-client = commands.AutoShardedBot(command_prefix="!", help_command=None, shard_count=1)
+client = commands.AutoShardedBot(command_prefix="?", help_command=None, shard_count=1)
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
@@ -45,7 +47,7 @@ async def on_ready():
 async def on_message(message):
     if re.search(token_rx, message.content) and message.guild:
         try:
-            await gcmds.msgDelete(gcmds, message)
+            await gcmds.msgDelete(message)
         except (discord.NotFound, discord.Forbidden):
             pass
         embed = discord.Embed(title="Token Found",
@@ -92,10 +94,10 @@ async def on_command_error(ctx, error):
                                   color=discord.Color.dark_red())
         await ctx.channel.send(embed=not_owner, delete_after=10)
     elif isinstance(error, commands.CommandNotFound):
-        await gcmds.invkDelete(gcmds, ctx)
+        await gcmds.invkDelete(ctx)
         notFound = discord.Embed(title="Command Not Found",
                                  description=f"{ctx.author.mention}, `{ctx.message.content}` "
-                                             f"does not exist\n\nDo `{gcmds.prefix(gcmds, ctx)}help` for help",
+                                             f"does not exist\n\nDo `?help` for help",
                                  color=discord.Color.dark_red())
         await ctx.channel.send(embed=notFound, delete_after=10)
     elif isinstance(error, commands.CommandOnCooldown):
@@ -120,7 +122,7 @@ def truncate(number: float, decimal_places: int):
     return math.trunc(stepper * number) / stepper
 
 
-if not gcmds.init_env(gcmds):
+if not gcmds.init_env():
     sys.exit("Please put your bot's token inside the created .env file")
 load_dotenv()
 token = os.getenv('TOKEN')
