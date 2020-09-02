@@ -5,3 +5,4 @@ __pycache__
 *.pyc
 /cogs/__pycache__
 *.json
+*.log
