@@ -1,0 +1,7 @@
+git+https://github.com/Rapptz/discord.py.git
+numpy==1.19.1
+num2words==0.5.10
+aiohttp~=3.6.2
+lavalink~=3.1.2
+python-dotenv~=0.14.0
+dateparser~=0.7.6
