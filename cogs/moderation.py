@@ -17,10 +17,80 @@ class Moderation(commands.Cog):
 
     def __init__(self, client):
         self.client = client
+        self.check_mute_expire.start()
+    
+    def cog_unload(self):
+        self.check_mute_expire.cancel()
 
     @commands.Cog.listener()
     async def on_ready(self):
         print(f'Cog "{self.qualified_name}" has been loaded')
+
+    @tasks.loop(seconds=60)
+    async def check_mute_expire(self):
+        current_time = int(datetime.now().timestamp())
+        if not os.path.exists('db/mutes.json'):
+            return
+
+        with open('db/mutes.json', 'r') as f:
+            file = json.load(f)
+            f.close()
+        for guild_id in file:
+            if not file[guild_id]:
+                continue
+            for user_id in file[guild_id]:
+                time = file[guild_id][user_id]['time']
+                if not time:
+                    continue
+                sleep_time = int(time - current_time)
+                if sleep_time > 60:
+                    continue
+                await asyncio.create_task(self.unmute_user(int(guild_id), int(user_id), sleep_time))
+
+    async def unmute_user(self, guild_id: int, user_id: int, sleep_time: int):
+        await asyncio.sleep(sleep_time)
+        guild = self.client.get_guild(guild_id)
+        role = discord.utils.get(guild.roles, name="Muted")
+        if not role:
+            return
+        member = guild.get_member(user_id)
+        if role in member.roles:
+            await member.remove_roles(role)
+            embed = discord.Embed(title="Your Mute Expired",
+                                  description=f"{member.mention}, your mute has expired in {guild.name}. Please avoid "
+                                  "doing what you were doing to get muted",
+                                  color=discord.Color.blue())
+            await member.send(embed=embed)
+        with open('db/mutes.json', 'r') as f:
+            file = json.load(f)
+            f.close()
+        try:
+            del file[str(guild_id)][str(user_id)]
+        except KeyError:
+            pass
+        with open('db/mutes.json', 'w') as g:
+            json.dump(file, g, indent=4)
+            g.close()
+        return
+
+    async def set_mute(self, ctx, member: discord.Member, time: int):
+        init = {
+            str(ctx.guild.id): {
+                str(member.id): {
+                    "time": time
+                }
+            }
+        }
+        gcmds.json_load('db/mutes.json', init)
+        with open('db/mutes.json', 'r') as f:
+            file = json.load(f)
+            f.close()
+        file.update({str(ctx.guild.id): {}})
+        file[str(ctx.guild.id)].update({str(member.id): {}})
+        file[str(ctx.guild.id)][str(member.id)].update({'time': time})
+        with open('db/mutes.json', 'w') as g:
+            json.dump(file, g, indent=4)
+            g.close()
 
     @commands.command(aliases=['clear', 'clean', 'chatclear', 'cleanchat', 'clearchat', 'purge'])
     @commands.has_permissions(manage_messages=True)
@@ -51,6 +121,17 @@ class Moderation(commands.Cog):
                                                reason="Use for mutes")
             for channel in ctx.guild.channels:
                 await channel.set_permissions(role, send_messages=False)
+
+        dates = search_dates(text=reason, settings={'PREFER_DATES_FROM': 'future'})
+        if not dates:
+            reason_nd = reason
+            timestring = ""
+        else:
+            reason_nd = reason.replace(f"{dates[0][0]}", "")
+            timestring = dates[0][0]
+        if reason.startswith(" "):
+            reason_nd = reason[1:]
+
         for member in members:
             if role in member.roles:
                 mutedEmbed = discord.Embed(title=f"{member} Already Muted",
@@ -66,11 +147,12 @@ class Moderation(commands.Cog):
                 with open(d, 'rb') as f:
                     picture = discord.File(f, d)
                     mutedEmbed = discord.Embed(title=f'Muted {member}️',
-                                               description=f"**Reason:** {reason}",
+                                               description=f"**Reason:** {reason_nd}\n**Duration:** {timestring}",
                                                color=discord.Color.blue())
                     mutedEmbed.set_thumbnail(url=f"attachment://muted_{name}")
                     mutedEmbed.set_footer(text=f'{member} was muted by: {ctx.author}')
                 await ctx.channel.send(file=picture, embed=mutedEmbed)
+            await self.set_mute(ctx, member, int(dates[0][1].timestamp()))
 
     @commands.command(aliases=['unsilence', 'unstfu', 'unshut', 'unshush', 'unshh', 'unshhh', 'unshhhh', 'unquiet'])
     @commands.bot_has_permissions(manage_roles=True)
