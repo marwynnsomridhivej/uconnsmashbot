@@ -32,7 +32,7 @@ class GlobalCMDS:
         return True
 
     def env_check(self, key: str):
-        if not self.init_env(self) or os.getenv(key) in default_env:
+        if not self.init_env() or os.getenv(key) in default_env:
             return False
         return os.getenv(key)
 
