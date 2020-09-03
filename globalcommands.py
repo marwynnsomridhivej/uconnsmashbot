@@ -8,7 +8,7 @@ env_write = ["TOKEN=YOUR_BOT_TOKEN",
              "UPDATES_CHANNEL=CHANNEL_ID_HERE",
              "LAVALINK_IP=IP_ADDR",
              "LAVALINK_PORT=PORT",
-             "LAVALINK_PASSWORD=DEFAULT_STRING"
+             "LAVALINK_PASSWORD=DEFAULT_STRING",
              "TENOR_API=API_KEY_FROM_TENOR"]
 default_env = ["YOUR_BOT_TOKEN",
                "YOUR_ID_HERE",
