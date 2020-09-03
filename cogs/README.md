@@ -26,7 +26,7 @@ To simplify things, I've made a chart that tells you what exactly the argument s
 |:---:|---|
 |[Moderation](#moderation)|[`chatclean`](#chatclean) [`mute`](#mute) [`unmute`](#unmute) [`kick`](#kick) [`ban`](#ban) [`unban`](#unban) [`modsonline`](#modsonline)|
 |[Music](#music)|[`join`](#join) [`play`](#play) [`queue`](#queue) [`queueclear`](#queueclear) [`stop`](#stop) [`leave`](#leave) [`volume`](#volume) [`playlist`](#playlist)|
-|[Owner](#owner)|`load` `unload` `reload` `shutdown`|
+|[Owner](#owner)|[`load`](#load) [`unload`](#unload) [`reload`](#reload) [`shutdown`](#shutdown)|
 |[Roles](#roles)|`reactionrole` `rank`|
 
 ## Moderation
@@ -283,7 +283,35 @@ The playlist commands use interactive panels to allow for easy user input of val
 
 
 ## Owner
+*Only the bot owner can use these commands*
 
+### Load
+#### Usage
+> `?load [extension]`
+
+#### Aliases
+`l` `ld`
+
+### Unload
+#### Usage
+> `?unload [extension]`
+
+#### Aliases
+`ul` `uld`
+
+### Reload
+#### Usage
+> `?reload`
+
+#### Aliases
+`r` `rl`
+
+### Shutdown
+#### Usage
+> `?shutdown`
+
+#### Aliases
+`taskkill`
 
 ## Roles
 
