@@ -25,7 +25,7 @@ To simplify things, I've made a chart that tells you what exactly the argument s
 |Name|Commands|
 |:---:|---|
 |[Moderation](#moderation)|[`chatclean`](#chatclean) [`mute`](#mute) [`unmute`](#unmute) [`kick`](#kick) [`ban`](#ban) [`unban`](#unban) [`modsonline`](#modsonline)|
-|[Music](#music)|`join` `play` `queue` `queueclear` `stop` `leave` `volume` `playlist`|
+|[Music](#music)|[`join`](#join) [`play`](#play) [`queue`](#queue) [`queueclear`](#queueclear) [`stop`](#stop) [`leave`](#leave) [`volume`](#volume) [`playlist`](#playlist)|
 |[Owner](#owner)|`load` `unload` `reload` `shutdown`|
 |[Roles](#roles)|`reactionrole` `rank`|
 
