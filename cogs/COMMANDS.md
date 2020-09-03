@@ -19,17 +19,17 @@ To simplify things, I've made a chart that tells you what exactly the argument s
 |`*va`|Variable amount of consecutive `arg` can be passed, but at least one must be passed|
 |`-arg_reliant`|Specifies that the current `arg` cannot be passed if the argument `arg_reliant` is not passed|
 
-## Cogs
+# Cogs
 |Name|Commands|
 |:---:|---|
-|[Moderation](#moderation)|[`chatclean`](#-chatclean) [`mute`](#mute) `unmute` `kick` `ban` `unban` `modsonline`|
+|[Moderation](#moderation)|[`chatclean`](#chatclean) [`mute`](#mute) `unmute` `kick` `ban` `unban` `modsonline`|
 |[Music](#music)|`join` `play` `queue` `queueclear` `stop` `leave` `volume` `playlist`|
 |[Owner](#owner)|`load` `unload` `reload` `shutdown`|
 |[Roles](#roles)|`reactionrole` `rank`|
 
-## <a name="moderation"></a> Moderation
+## Moderation
 
-### <a name="chatclean"></a> Chatclean
+### Chatclean
 ##### Usage
 > `?chatclean (amount) (@mention)-amount`
 
@@ -48,6 +48,10 @@ To simplify things, I've made a chart that tells you what exactly the argument s
 ##### Usage
 > `?mute [@mention]*va (reason)(dt)`
 
+##### Examples
+![](../docs/mute_start.jpg)
+![](../docs/mute_end.jpg)
+
 ##### Permissions
 |User|Bot|
 |:---:|:---:|
@@ -61,11 +65,11 @@ To simplify things, I've made a chart that tells you what exactly the argument s
 ##### Aliases
 `clear` `clean` `chatclear` `cleanchat` `clearchat` `purge`
 
-## <a name="music"></a> Music
+## Music
 
 
-## <a name="owner"></a> Owner
+## Owner
 
 
-## <a name="roles"></a> Roles
+## Roles
 
