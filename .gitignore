@@ -6,3 +6,5 @@ __pycache__
 /cogs/__pycache__
 *.json
 *.log
+*.yml
+*.jar
