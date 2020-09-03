@@ -14,7 +14,7 @@ gcmds = GlobalCMDS()
 
 
 class Moderation(commands.Cog):
-    
+
     def __init__(self, client):
         self.client = client
 
@@ -40,7 +40,6 @@ class Moderation(commands.Cog):
         clearEmbed.set_thumbnail(
             url="https://cdn.discordapp.com/attachments/734962101432615006/734962158290468944/eraser.png")
         await ctx.channel.send(embed=clearEmbed, delete_after=5)
-        gcmds.incrCounter(gcmds, ctx, 'chatclean')
 
     @commands.command(aliases=['silence', 'stfu', 'shut', 'shush', 'shh', 'shhh', 'shhhh', 'quiet'])
     @commands.bot_has_permissions(manage_roles=True)
@@ -72,7 +71,6 @@ class Moderation(commands.Cog):
                     mutedEmbed.set_thumbnail(url=f"attachment://muted_{name}")
                     mutedEmbed.set_footer(text=f'{member} was muted by: {ctx.author}')
                 await ctx.channel.send(file=picture, embed=mutedEmbed)
-        gcmds.incrCounter(gcmds, ctx, 'mute')
 
     @commands.command(aliases=['unsilence', 'unstfu', 'unshut', 'unshush', 'unshh', 'unshhh', 'unshhhh', 'unquiet'])
     @commands.bot_has_permissions(manage_roles=True)
@@ -97,7 +95,6 @@ class Moderation(commands.Cog):
                                             color=discord.Color.blue())
                 unmuteEmbed.set_footer(text=f'{member} was unmuted by: {ctx.author}')
                 await ctx.channel.send(embed=unmuteEmbed)
-                gcmds.incrCounter(gcmds, ctx, 'unmute')
 
     @commands.command()
     @commands.bot_has_permissions(kick_members=True)
@@ -113,7 +110,6 @@ class Moderation(commands.Cog):
                                 value=reason,
                                 inline=False)
             await ctx.channel.send(embed=kickEmbed)
-            gcmds.incrCounter(gcmds, ctx, 'kick')
 
     @commands.command()
     @commands.bot_has_permissions(ban_members=True)
@@ -135,7 +131,6 @@ class Moderation(commands.Cog):
                                value=reason,
                                inline=False)
             await ctx.channel.send(embed=banEmbed)
-            gcmds.incrCounter(gcmds, ctx, 'ban')
 
     @commands.command()
     @commands.bot_has_permissions(ban_members=True)
@@ -162,7 +157,7 @@ class Moderation(commands.Cog):
                                 value=ctx.author.mention)
                 await ctx.guild.unban(user, reason="Moderator: " + str(ctx.author))
                 await ctx.channel.send(embed=unban)
-                gcmds.incrCounter(gcmds, ctx, 'unban')
+
             else:
                 notBanned = discord.Embed(title="User Not Banned!",
                                           description='For now :)',
@@ -172,7 +167,6 @@ class Moderation(commands.Cog):
                                     value=ctx.author.mention,
                                     inline=False)
                 await ctx.channel.send(embed=notBanned, delete_after=5)
-                gcmds.incrCounter(gcmds, ctx, 'unban')
 
     @commands.command(aliases=['mod', 'mods', 'modsonline', 'mo'])
     async def modsOnline(self, ctx):
@@ -200,7 +194,6 @@ class Moderation(commands.Cog):
                                   color=color)
         modsEmbed.set_thumbnail(url="https://www.pinclipart.com/picdir/big/529-5290012_gavel-clipart.png")
         await ctx.channel.send(embed=modsEmbed, delete_after=60)
-        gcmds.incrCounter(gcmds, ctx, 'modsonline')
 
 
 def setup(client):
