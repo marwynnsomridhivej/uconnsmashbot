@@ -11,12 +11,11 @@ The bot has some really neat features. Here is a complete list of them:
 |:---:|:---:|
 |`list is WIP`|`will receive update once commands are finalised`|
 
-## Security Concerns
+## Security Concerns and Privacy
 As with everything, I understand that you may have some security concerns regarding this bot, as it is not verified by 
 Discord. The reason I have made this source code public is so that anybody who has concerns can evaluate the source 
 code for themselves and reach the conclusion that this bot is indeed safe to use.
 
-## Privacy
 I respect your privacy and take it very seriously. To be entirely transparent, here is everything that the bot collects and stores in its databases:
 
 > - Server ID*
