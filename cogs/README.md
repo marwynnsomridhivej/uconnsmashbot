@@ -27,7 +27,7 @@ To simplify things, I've made a chart that tells you what exactly the argument s
 |[Moderation](#moderation)|[`chatclean`](#chatclean) [`mute`](#mute) [`unmute`](#unmute) [`kick`](#kick) [`ban`](#ban) [`unban`](#unban) [`modsonline`](#modsonline)|
 |[Music](#music)|[`join`](#join) [`play`](#play) [`queue`](#queue) [`queueclear`](#queueclear) [`stop`](#stop) [`leave`](#leave) [`volume`](#volume) [`playlist`](#playlist)|
 |[Owner](#owner)|[`load`](#load) [`unload`](#unload) [`reload`](#reload) [`shutdown`](#shutdown)|
-|[Roles](#roles)|`reactionrole` `rank`|
+|[Roles](#roles)|[`reactionrole`](#reaction-roles) [`rank`](#rank)|
 
 ## Moderation
 
@@ -313,5 +313,45 @@ The playlist commands use interactive panels to allow for easy user input of val
 #### Aliases
 `taskkill`
 
+
 ## Roles
 
+### Reaction Roles
+#### Usage
+> `?reactionrole`
+
+#### Aliases
+`rr`
+
+#### Creating a Reaction Roles Panel
+> `?reactionrole create`
+
+##### Aliases
+`-c` `start` `make`
+
+#### Editing a Reaction Roles Panel
+> `?reactionrole edit`
+
+##### Aliases
+`-e` `adjust`
+
+#### Deleting a Reaction Roles Panel
+> `?reactionrole delete`
+
+#### Aliases
+`-d` `-rm` `del`
+
+#### Reaction Roles Setup Panel
+Executing any reaction roles command will automatically start a setup panel that will guide you through inputting the required information for that command
+
+### Rank
+#### Usage
+> `?rank (role_name)`
+
+#### Examples
+![](../docs/rank_no_name.jpg)
+![](../docs/rank_with_role.jpg)
+
+#### Special Cases
+- If `role_name` is not specified, it will return an embed with all the possible `role_name` arguments
+- `role_name` is case sensitive
