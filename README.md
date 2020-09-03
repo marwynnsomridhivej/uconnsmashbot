@@ -5,7 +5,7 @@ This is a bot created by [@marwynnsomridhivej](https://github.com/marwynnsomridh
 The bot's global prefix is `?` and is not customisable, however, this may change at the E-Board's discretion. The bot currently does not support custom prefixes, but that can change at a moment's notice, as I can implement that code whenever it is needed.
 
 ## Features
-The bot has some really neat features. A complete list of them can be found [here](/cogs/README.md) file
+The bot has some really neat features. A complete list of them can be found [here](/cogs/README.md)
 
 ## Security Concerns and Privacy
 As with everything, I understand that you may have some security concerns regarding this bot, as it is not verified by 
