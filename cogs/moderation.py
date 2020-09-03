@@ -1,4 +1,5 @@
 import discord
+import typing
 from discord.ext import commands, tasks
 from globalcommands import GlobalCMDS
 import os
