@@ -1,5 +1,5 @@
 # Commands
-Commands are sorted into **cogs**, which are essentially groups of commands. The discord.py library uses cogs as a way of organising similar commands together so that the final file won't be a billion lines long.
+Commands are sorted into **[cogs](#cogs)**, which are essentially groups of commands. The discord.py library uses cogs as a way of organising similar commands together so that the final file won't be a billion lines long.
 
 Each command can be invoked using its name or aliases, which will be listed below. Some commands have convenient aliases that will save you some time.
 
