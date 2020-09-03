@@ -4,6 +4,7 @@
 __pycache__
 *.pyc
 /cogs/__pycache__
+logs
 *.json
 *.log
 *.yml
