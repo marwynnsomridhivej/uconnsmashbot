@@ -796,12 +796,12 @@ class Roles(commands.Cog):
 
     @commands.command()
     @commands.bot_has_permissions(manage_roles=True)
-    async def rank(self, ctx, *, name):
+    async def rank(self, ctx, *, name: str = None):
         if not name or name not in role_names:
             embed = discord.Embed(title="Available Roles",
                                   description=f"{ctx.author.mention}, get a role using `?role [role_name]`"
                                   f"\n\n**Valid Role Names:**\n```{newline.join(role_names)}```",
-                                  color=discord.Color.dark_red())
+                                  color=discord.Color.blue())
         elif name in role_names:
             role_converter = commands.RoleConverter()
             role = await role_converter.convert(ctx, name)
