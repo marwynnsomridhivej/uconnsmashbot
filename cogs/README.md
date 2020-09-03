@@ -22,7 +22,7 @@ To simplify things, I've made a chart that tells you what exactly the argument s
 # Cogs
 |Name|Commands|
 |:---:|---|
-|[Moderation](#moderation)|[`chatclean`](#chatclean) [`mute`](#mute) `unmute` `kick` `ban` `unban` `modsonline`|
+|[Moderation](#moderation)|[`chatclean`](#chatclean) [`mute`](#mute) [`unmute`](#unmute) [`kick`](#kick) [`ban`](#ban) [`unban`](#unban) [`modsonline`](#modsonline)|
 |[Music](#music)|`join` `play` `queue` `queueclear` `stop` `leave` `volume` `playlist`|
 |[Owner](#owner)|`load` `unload` `reload` `shutdown`|
 |[Roles](#roles)|`reactionrole` `rank`|
