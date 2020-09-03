@@ -805,10 +805,16 @@ class Roles(commands.Cog):
         elif name in role_names:
             role_converter = commands.RoleConverter()
             role = await role_converter.convert(ctx, name)
-            await ctx.author.add_roles(role)
-            embed = discord.Embed(title="Role Added",
-                                  description=f"{ctx.author.mention}, you have been given the {role.mention} role",
-                                  color=discord.Color.blue())
+            if role not in ctx.author.roles:
+                await ctx.author.add_roles(role)
+                embed = discord.Embed(title="Role Added",
+                                    description=f"{ctx.author.mention}, you have been given the {role.mention} role",
+                                    color=discord.Color.blue())
+            else:
+                await ctx.author.remove_roles(role)
+                embed = discord.Embed(title="Role Removed",
+                                      description=f"{ctx.author.mention}, you are no longer in {role.mention}",
+                                      color=discord.Color.dark_red())
         return await ctx.channel.send(embed=embed)
 
 def setup(client):
