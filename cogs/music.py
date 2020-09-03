@@ -843,8 +843,6 @@ class Music(commands.Cog):
                                      color=discord.Color.dark_red())
             return await ctx.channel.send(embed=no_plist, delete_after=10)
 
-        print(self.get_playlist(ctx, playlist_name)[0])
-
         for item in self.get_playlist(ctx, playlist_name)[1]:
             results = await player.node.get_tracks(item)
             track = results['tracks'][0]
@@ -908,7 +906,6 @@ class Music(commands.Cog):
                     return await ctx.channel.send(embed=no_panel, delete_after=5)
                 choice = await self.client.wait_for("reaction_add", check=reaction_check,
                                                                 timeout=30)
-                print(choice)
             except asyncio.TimeoutError:
                 timeout = discord.Embed(title="Save Request Timed Out",
                                         description=f"{ctx.author.mention}, your save request timed out. Please try again",
@@ -1260,7 +1257,6 @@ class Music(commands.Cog):
 
         if action == "confirm":
             test = self.remove_playlist(ctx, name)
-            print(test)
             edited = discord.Embed(title="Deleted Playlist",
                                    description=f"{ctx.author.mention}, your playlist *\"{name}\"* was deleted",
                                    color=discord.Color.blue())
