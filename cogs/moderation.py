@@ -73,7 +73,7 @@ class Moderation(commands.Cog):
             g.close()
         return
 
-    async def set_mute(self, ctx, member: discord.Member, time: int):
+    async def set_mute(self, ctx, member: discord.Member, time: int = None):
         init = {
             str(ctx.guild.id): {
                 str(member.id): {
@@ -94,6 +94,7 @@ class Moderation(commands.Cog):
 
     @commands.command(aliases=['clear', 'clean', 'chatclear', 'cleanchat', 'clearchat', 'purge'])
     @commands.has_permissions(manage_messages=True)
+    @commands.bot_has_permissions(manage_messages=True)
     async def chatclean(self, ctx, amount=1, member: discord.Member = None):
         def from_user(message):
             return member is None or message.author == member
@@ -125,10 +126,12 @@ class Moderation(commands.Cog):
         dates = search_dates(text=reason, settings={'PREFER_DATES_FROM': 'future'})
         if not dates:
             reason_nd = reason
-            timestring = ""
+            timestring = "Indefinite"
+            timestamp = None
         else:
             reason_nd = reason.replace(f"{dates[0][0]}", "")
             timestring = dates[0][0]
+            timestamp = dates[0][1].timestamp()
         if reason.startswith(" "):
             reason_nd = reason[1:]
 
@@ -146,13 +149,13 @@ class Moderation(commands.Cog):
                 d = f'{path}//{name}'
                 with open(d, 'rb') as f:
                     picture = discord.File(f, d)
-                    mutedEmbed = discord.Embed(title=f'Muted {member}️',
-                                               description=f"**Reason:** {reason_nd}\n**Duration:** {timestring}",
-                                               color=discord.Color.blue())
-                    mutedEmbed.set_thumbnail(url=f"attachment://muted_{name}")
-                    mutedEmbed.set_footer(text=f'{member} was muted by: {ctx.author}')
+                mutedEmbed = discord.Embed(title=f'Muted {member}️',
+                                            description=f"**Reason:** {reason_nd}\n**Duration:** {timestring}",
+                                            color=discord.Color.blue())
+                mutedEmbed.set_thumbnail(url=f"attachment://muted_{name}")
+                mutedEmbed.set_footer(text=f'{member} was muted by: {ctx.author}')
                 await ctx.channel.send(file=picture, embed=mutedEmbed)
-            await self.set_mute(ctx, member, int(dates[0][1].timestamp()))
+                await self.set_mute(ctx, member, timestamp)
 
     @commands.command(aliases=['unsilence', 'unstfu', 'unshut', 'unshush', 'unshh', 'unshhh', 'unshhhh', 'unquiet'])
     @commands.bot_has_permissions(manage_roles=True)
@@ -221,8 +224,7 @@ class Moderation(commands.Cog):
         for user in users:
             try:
                 user = await commands.converter.UserConverter().convert(ctx, user)
-
-            except:
+            except commands.BadArgument:
                 error = discord.Embed(title='Error',
                                       description='User could not be found!',
                                       color=discord.Color.dark_red())
