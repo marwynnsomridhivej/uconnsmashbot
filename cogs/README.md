@@ -10,6 +10,8 @@ To simplify things, I've made a chart that tells you what exactly the argument s
 |:---:|---|
 |`?`|Bot's static global prefix|
 |`command_name`|The command's name. Most of the time, the `command_name` provided will be what is written into the code as the method's name. The `command_name` will always be postfixed to the prefix|
+|`sub_command`|This command has subcommands|
+|`sub_command_args`|Arguments for the subcommand|
 |`arg`|An arbitrary argument of any datatype. The datatype will be specified if the `arg` requires data to be in a specific datatype|
 |`[arg]`|The `arg` is necessary for command to function properly. You must provide whatever argument that is listed or else the command cannot be called|
 |`(arg)`|The `arg` is optional, and will still allow the command to function without it|
@@ -154,7 +156,130 @@ To simplify things, I've made a chart that tells you what exactly the argument s
 - Will only detect statuses `Online`, `Away`, and `DND`
 - Will not count any bots
 
+
 ## Music
+
+### Join
+#### Usage
+> `?join`
+
+#### Examples
+![](../docs/join.jpg)
+
+#### Special Cases
+- This command will move the bot from its current connected channel to the one you are currently connected in if you execute this command while in a different voice channel as the bot
+
+### Play
+#### Usage
+> `?play (query_URL)`
+
+#### Examples
+![](../docs/play.jpg)
+
+#### Control Panel
+> ⏪ - play previous song in queue
+> 
+> ⏯️ - play/pause current song
+> 
+> ⏩ - play next song in queue
+> 
+> ⏹️ - stop playing all songs and clear queue
+
+#### Special Cases
+- `query_URL` can be the following types
+    - YouTube Video URL
+    - YouTube Playlist URL
+    - YouTube Livestream URL
+    - A search term
+- **ONLY IF** a song is loaded in queue, then you can execute play without specifying `query_URL`
+
+### Queue
+#### Usage
+> `?queue (query_URL)`
+
+#### Examples
+![](../docs/queue.jpg)
+
+#### Special Cases
+- `query_URL` can be the following types
+    - YouTube Video URL
+    - YouTube Playlist URL
+    - YouTube Livestream URL
+    - A search term
+    - Nothing
+- If `query_URL` is not explicitly specified, it will display the current queue
+- You must be in the same voice channel as the bot to use this command
+
+### QueueClear
+#### Usage
+> `?queueclear`
+
+#### Aliases
+`clearqueue` `qc`
+
+#### Examples
+![](../docs/queueclear.jpg)
+
+#### Special Cases
+- You must be in the same voice channel as the bot to use this command
+- Nothing will be cleared if there is nothing queued
+
+### Stop
+#### Usage
+> `?stop`
+
+#### Special Cases
+- Only the server owner is authorised to use this command
+- You must be in the same voice channel as the bot to use this command
+- For ordinary users, click the stop icon on the play control panel. See [control panel](#control-panel) for more details
+
+### Leave
+#### Usage
+> `?leave`
+
+#### Examples
+![](../docs/leave.jpg)
+
+#### Special Cases
+- You must be in the same voice channel as the bot to use this command
+
+### Volume
+#### Usage
+> `?volume [amount]`
+
+#### Examples
+![](../docs/volume.jpg)
+
+#### Special Cases
+- `amount` must be an integer between 1 - 100, otherwise it will display the current volume
+
+### Playlist
+#### Usage
+> `?playlist (sub_command) (sub_command_args)`
+
+#### Aliases
+`playlists`
+
+#### Loading Saved Playlist
+> `?playlist load [playlist_name]`
+
+#### Saving A Playlist From Queue
+> `?playlist save`
+
+##### Aliases
+`edit`
+
+#### Adding Tracks to Saved Playlist
+> `?playlist add`
+
+#### Removing Saved Playlist
+> `?playlist remove`
+
+##### Aliases
+`delete`
+
+#### Interactive Panel
+The playlist commands use interactive panels to allow for easy user input of values required for the commands to work
 
 
 ## Owner
