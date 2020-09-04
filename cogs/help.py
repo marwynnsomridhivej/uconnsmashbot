@@ -69,11 +69,9 @@ class Help(commands.Cog):
             ownerCmds = f"`{'` `'.join(strings['owner'])}`"
             pokedexCmds = "`?pokedex` *for a full list*"
             rolesCmds = f"`{'` `'.join(strings['roles'])}`"
-            welcomeCmds = "temp"  # f"`{'` `'.join(strings['welcome'])}`"
 
             cog_list = [("Actions", actionCmds), ("Help", helpCmds), ("Moderation", moderationCmds),
-                        ("Music", musicCmds), ("Owner", ownerCmds), ("Pokédex", pokedexCmds), ("Roles", rolesCmds),
-                        ("Welcomer", welcomeCmds)]
+                        ("Music", musicCmds), ("Owner", ownerCmds), ("Pokédex", pokedexCmds), ("Roles", rolesCmds)]
 
             embed = discord.Embed(title="Help Menu",
                                   description=f"{ctx.author.mention}, here are all the commands I support:",
