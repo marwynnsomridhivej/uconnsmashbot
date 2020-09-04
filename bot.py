@@ -17,6 +17,7 @@ DISABLED_COGS = ["Blackjack", 'Coinflip', 'Connectfour', 'Oldmaid', 'Slots', 'Un
                  'Reactions', 'Moderation', 'Music', 'Utility']
 DISABLED_COMMANDS = []
 token_rx = re.compile(r'[MN]\w{23}.\w{6}.\w{27}')
+version = "UCONN Smash Bot v1.0.0"
 
 if os.path.exists('discord.log'):
     os.remove('discord.log')
@@ -42,6 +43,7 @@ async def on_ready():
         print(f"Cog \"{cog}\" has been loaded")
     hostname = socket.gethostname()
     ip = socket.gethostbyname(hostname)
+    print(f"Running {version}")
     print(f'Successfully logged in as {client.user}\nIP: {ip}\nHost: {str(hostname)}\nServing '
           f'{len(client.users)} users across {len(client.guilds)} servers')
     status.start()
@@ -51,7 +53,7 @@ async def on_ready():
 async def status():
     activity1 = discord.Activity(name="?h for help!", type=discord.ActivityType.listening)
     activity2 = discord.Activity(name=f"{len(client.users)} users!", type=discord.ActivityType.watching)
-    activity3 = discord.Activity(name="UCONN Smash Bot v.1.0.0", type=discord.ActivityType.playing)
+    activity3 = discord.Activity(name=version, type=discord.ActivityType.playing)
     activity4 = discord.Activity(name=f"{len(client.commands)} commands", type=discord.ActivityType.listening)
     activity5 = discord.Activity(name="Keep Your Distance!", type=discord.ActivityType.playing)
     activity6 = discord.Activity(name="Stay safe!", type=discord.ActivityType.playing)
