@@ -63,6 +63,7 @@ class Help(commands.Cog):
                 cog_commands = self.client.get_cog(name).get_commands()
                 strings.update({name.lower(): [command.name.lower() for command in cog_commands]})
             actionCmds = "`?actions` *for a full list*"
+            funCmds = f"`{'` `'.join(strings['fun'])}`"
             helpCmds = "`help`"
             moderationCmds = f"`{'` `'.join(strings['moderation'])}`"
             musicCmds = f"`{'` `'.join(strings['music'])}`"
@@ -88,6 +89,23 @@ class Help(commands.Cog):
             embed.set_thumbnail(url="https://www.jing.fm/clipimg/full/71-716621_transparent-clip-art-open-book-frame-line-art.png")
 
             return await ctx.channel.send(embed=embed)
+
+    # Fun
+    @_help.command(aliases=['8ball', '8b'])
+    async def eightball(self, ctx):
+        syntax = '?eightball [question]'
+        return await self.send_help(ctx, syntax)
+    
+    @_help.command()
+    async def choose(self, ctx):
+        syntax = '`?choose [options]'
+        spec = "`options` must be delimited by \"or\""
+        return await self.send_help(ctx, syntax, spec=spec)
+    
+    @_help.command()
+    async def say(self, ctx):
+        syntax = "`?say [message]`"
+        return await self.send_help(ctx, syntax)
 
     # Help
     @_help.command(aliases=['h'])
