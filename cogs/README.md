@@ -1,7 +1,9 @@
 # Commands
-Commands are sorted into **[cogs](#cogs)**, which are essentially groups of commands. The discord.py library uses cogs as a way of organising similar commands together so that the final file won't be a billion lines long.
+Commands are sorted into **[cogs](#cogs)**, which are essentially groups of commands. The discord.py library uses cogs as a way of organising similar commands together so that the main script won't be a billion lines long.
 
 Each command can be invoked using its name or aliases, which will be listed below. Some commands have convenient aliases that will save you some time.
+
+Some commands will have subcommands, which are additional commands that are passed as the second argument to the command. This will make more sense as you read this page.
 
 ## Documentation Syntax
 To simplify things, I've made a chart that tells you what exactly the argument syntax means
@@ -24,7 +26,7 @@ To simplify things, I've made a chart that tells you what exactly the argument s
 # Cogs
 |Name|Commands|
 |:---:|---|
-|[Moderation](#moderation)|[`chatclean`](#chatclean) [`mute`](#mute) [`unmute`](#unmute) [`kick`](#kick) [`ban`](#ban) [`unban`](#unban) [`modsonline`](#modsonline)|
+|[Moderation](#moderation)|[`chatclean`](#chatclean) [`mute`](#mute) [`unmute`](#unmute) [`kick`](#kick) [`ban`](#ban) [`unban`](#unban) [`warn`](#warn) [`offense`](#offense) [`expunge`](#expunge) [`modsonline`](#modsonline)|
 |[Music](#music)|[`join`](#join) [`play`](#play) [`queue`](#queue) [`queueclear`](#queueclear) [`stop`](#stop) [`leave`](#leave) [`volume`](#volume) [`playlist`](#playlist)|
 |[Owner](#owner)|[`load`](#load) [`unload`](#unload) [`reload`](#reload) [`shutdown`](#shutdown)|
 |[Roles](#roles)|[`reactionrole`](#reaction-roles) [`rank`](#rank)|
@@ -140,6 +142,52 @@ To simplify things, I've made a chart that tells you what exactly the argument s
     - User mention
     - User name#discriminator
     - User name
+
+### Warn
+#### Usage
+> `?warn [@mention]*va (reason)`
+
+#### Examples
+![](/docs/warninvoke.jpg)
+![](/docs/warnreceipt.jpg)
+- The bottom picture is what the `@mention` would receive in their DMs upon warn, just without the topmost line
+
+#### Permissions
+|User|Bot|
+|:---:|:---:|
+|`Ban Members`|`Ban Members`|
+
+#### Consequence Structure
+> 1st Warn - Nothing
+> 2nd Warn - Mute for 10 minutes
+> 3rd Warn - Kicked from the server
+> 4th Warn - Banned from the server
+
+### Offense
+#### Usage
+> `?offense (@mention)`
+
+#### Aliases
+`offenses`
+
+#### Examples
+![](/docs/offense.jpg)
+![](/docs/offensenoargs.jpg)
+
+#### Special Cases
+- This command searches for all warnings that you have given. If you haven't given that user any warnings, offense will return nothing, even if that user has warnings from other moderators
+
+### Expunge
+#### Usage
+> `?expunge [@mention]`
+
+#### Permissions
+|User|Bot|
+|:---:|:---:|
+|`Ban Members`|`Ban Members`|
+
+#### Interactive Panel
+Instructions on how to expunge warn records will be given on an interactive panel
 
 ### ModsOnline
 #### Usage
@@ -318,7 +366,7 @@ The playlist commands use interactive panels to allow for easy user input of val
 
 ### Reaction Roles
 #### Usage
-> `?reactionrole`
+> `?reactionrole (sub_command)`
 
 #### Aliases
 `rr`
@@ -355,3 +403,4 @@ Executing any reaction roles command will automatically start a setup panel that
 #### Special Cases
 - If `role_name` is not specified, it will return an embed with all the possible `role_name` arguments
 - `role_name` is case sensitive
+- Doing this command when you already have the role will remove the role from you
