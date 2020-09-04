@@ -44,6 +44,20 @@ async def on_ready():
     ip = socket.gethostbyname(hostname)
     print(f'Successfully logged in as {client.user}\nIP: {ip}\nHost: {str(hostname)}\nServing '
           f'{len(client.users)} users across {len(client.guilds)} servers')
+    status.start()
+
+
+@tasks.loop(seconds=120)
+async def status():
+    activity1 = discord.Activity(name="?h for help!", type=discord.ActivityType.listening)
+    activity2 = discord.Activity(name=f"{len(client.users)} users!", type=discord.ActivityType.watching)
+    activity3 = discord.Activity(name="UCONN Smash Bot v.1.0.0", type=discord.ActivityType.playing)
+    activity4 = discord.Activity(name=f"{len(client.commands)} commands", type=discord.ActivityType.listening)
+    activity5 = discord.Activity(name="Keep Your Distance!", type=discord.ActivityType.playing)
+    activity6 = discord.Activity(name="Stay safe!", type=discord.ActivityType.playing)
+    activityList = [activity1, activity2, activity3, activity4, activity5, activity6]
+    activity = random.choice(activityList)
+    await client.change_presence(status=discord.Status.online, activity=activity)
 
 
 @client.event
