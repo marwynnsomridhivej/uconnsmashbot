@@ -234,7 +234,7 @@ class Pokedex(commands.Cog):
         if not ctx.invoked_subcommand:
             panel = discord.Embed(title="Pokedex Commands",
                                   description=f"Access MarwynnBot's Pokédex using `?pokedex "
-                                              f"[option]`. Please note that in order to avoid discrepancies in "
+                                              f"(option)`. Please note that in order to avoid discrepancies in "
                                               f"versions, I have not included many of the game specific data.\n Here "
                                               f"is a list of all available `pokedex` options",
                                   color=discord.Color.blue())
