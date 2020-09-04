@@ -5,6 +5,7 @@ The files that will be created are as follows:
 ```
 ./db
   ↳
+    - actionstats.json*
     - mutes.json*
     - playlists.json*
     - reactionroles.json
