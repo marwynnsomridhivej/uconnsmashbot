@@ -12,13 +12,14 @@ class Help(commands.Cog):
     async def on_ready(self):
         print(f'Cog "{self.qualified_name}" has been loaded')
 
-    async def send_help(self, ctx, name: str, syntax: str, perms: list = None,
+    async def send_help(self, ctx, syntax: str, perms: list = None,
                         example: str = None, spec: str = None) -> discord.Message:
         timestamp = f"Executed by {ctx.author.display_name} " + "at: {:%m/%d/%Y %H:%M:%S}".format(datetime.now())
+        name = ctx.command.name
         cmd = self.client.get_command(ctx.command.name)
         aliases = cmd.aliases
 
-        embed = discord.Embed(title=f"{ctx.invoked_subcommand.title()} Help",
+        embed = discord.Embed(title=f"{name.title()} Help",
                               color=discord.Color.blue(),
                               url=f"https://github.com/marwynnsomridhivej/uconnsmashbot/tree/master/cogs#{name.lower()}")
         embed.add_field(name="Syntax",
@@ -62,7 +63,7 @@ class Help(commands.Cog):
                 cog_commands = self.client.get_cog(name).get_commands()
                 strings.update({name.lower(): [command.name.lower() for command in cog_commands]})
             actionCmds = "`?actions` *for a full list*"
-            helpCmds = f"`{'` `'.join(strings['help'])}`"
+            helpCmds = "`help`"
             moderationCmds = f"`{'` `'.join(strings['moderation'])}`"
             musicCmds = f"`{'` `'.join(strings['music'])}`"
             ownerCmds = f"`{'` `'.join(strings['owner'])}`"

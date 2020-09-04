@@ -799,7 +799,7 @@ class Roles(commands.Cog):
     async def rank(self, ctx, *, name: str = None):
         if not name or name not in role_names:
             embed = discord.Embed(title="Available Roles",
-                                  description=f"{ctx.author.mention}, get a role using `?role [role_name]`"
+                                  description=f"{ctx.author.mention}, get a role using `?rank [role_name]`"
                                   f"\n\n**Valid Role Names:**\n```{newline.join(role_names)}```",
                                   color=discord.Color.blue())
         elif name in role_names:

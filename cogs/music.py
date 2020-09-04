@@ -44,7 +44,9 @@ class Music(commands.Cog):
         player = self.client.lavalink.player_manager.get(reaction.message.guild.id)
         if reaction.emoji not in reactions:
             return
-        if not user.bot and player:
+        if not user.voice:
+            return
+        if not user.bot and player and user.voice.channel.id == int(player.fetch('channel')):
             guild_id = reaction.message.guild.id
             message = self.info[str(guild_id)]['message']
             paused = self.info[str(guild_id)]['paused']

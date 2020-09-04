@@ -605,14 +605,12 @@ class Moderation(commands.Cog):
             if member.status is not discord.Status.offline:
                 if not member.bot:
                     for role in member.roles:
-                        if "moderator" in role.name.casefold():
+                        if "moderator" in role.name.casefold() or "e-board" in role.name.casefold():
                             modsList += [member.mention]
         if modsList:
             title = "Moderators Online"
-            description = ""
+            description = "\n".join(modsList)
             color = discord.Color.blue()
-            for mods in modsList:
-                description = f"{description} {mods}"
         else:
             title = "No Moderators Online"
             description = "There are currently no users that are moderators on this server\n\n*No users have a role " \

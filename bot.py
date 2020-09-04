@@ -97,7 +97,6 @@ async def on_command_error(ctx, error):
                                   color=discord.Color.dark_red())
         await ctx.channel.send(embed=not_owner, delete_after=10)
     elif isinstance(error, commands.CommandNotFound):
-        await gcmds.invkDelete(ctx)
         notFound = discord.Embed(title="Command Not Found",
                                  description=f"{ctx.author.mention}, `{ctx.message.content}` "
                                              f"does not exist\n\nDo `?help` for help",
