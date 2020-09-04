@@ -31,6 +31,7 @@ To simplify things, I've made a chart that tells you what exactly the argument s
 |[Moderation](#moderation)|[`chatclean`](#chatclean) [`mute`](#mute) [`unmute`](#unmute) [`kick`](#kick) [`ban`](#ban) [`unban`](#unban) [`warn`](#warn) [`offense`](#offense) [`expunge`](#expunge) [`modsonline`](#modsonline)|
 |[Music](#music)|[`join`](#join) [`play`](#play) [`queue`](#queue) [`queueclear`](#queueclear) [`stop`](#stop) [`leave`](#leave) [`volume`](#volume) [`playlist`](#playlist)|
 |[Owner](#owner)|[`load`](#load) [`unload`](#unload) [`reload`](#reload) [`shutdown`](#shutdown)|
+|[Pokédex](#pokédex)|[`pokedex`](#pokédex)|
 |[Roles](#roles)|[`reactionrole`](#reaction-roles) [`rank`](#rank)|
 
 ## Actions
@@ -385,6 +386,17 @@ The playlist commands use interactive panels to allow for easy user input of val
 #### Aliases
 `taskkill`
 
+
+## Pokédex
+#### Usage
+> `?pokedex (option)`
+
+#### Aliases
+`dex`
+
+#### Special Cases
+- This only returns the help command for `option` if specified
+- If `option` is not explicitly specified, it returns the help panel that details all pokédex commands
 
 ## Roles
 
