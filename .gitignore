@@ -9,3 +9,4 @@ logs
 *.log
 *.yml
 *.jar
+/pokepy_cache
