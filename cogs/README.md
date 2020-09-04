@@ -26,10 +26,21 @@ To simplify things, I've made a chart that tells you what exactly the argument s
 # Cogs
 |Name|Commands|
 |:---:|---|
+|[Help](#help)|[`help`](#help)|
 |[Moderation](#moderation)|[`chatclean`](#chatclean) [`mute`](#mute) [`unmute`](#unmute) [`kick`](#kick) [`ban`](#ban) [`unban`](#unban) [`warn`](#warn) [`offense`](#offense) [`expunge`](#expunge) [`modsonline`](#modsonline)|
 |[Music](#music)|[`join`](#join) [`play`](#play) [`queue`](#queue) [`queueclear`](#queueclear) [`stop`](#stop) [`leave`](#leave) [`volume`](#volume) [`playlist`](#playlist)|
 |[Owner](#owner)|[`load`](#load) [`unload`](#unload) [`reload`](#reload) [`shutdown`](#shutdown)|
 |[Roles](#roles)|[`reactionrole`](#reaction-roles) [`rank`](#rank)|
+
+## Help
+#### Usage
+> `?help (command_name)`
+
+#### Aliases
+`h`
+
+#### Special Cases
+- If `command_name` is not explicitly specified, it defaults to showing all commands the bot currently supports
 
 ## Moderation
 
@@ -39,6 +50,9 @@ To simplify things, I've made a chart that tells you what exactly the argument s
 
 #### Aliases
 `clear` `clean` `chatclear` `cleanchat` `clearchat` `purge`
+
+#### Examples
+![](/docs/chatclean.jpg)
 
 #### Permissions
 |User|Bot|
