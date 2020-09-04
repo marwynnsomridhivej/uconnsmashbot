@@ -1,4 +1,4 @@
-# UCONN Smash Discord Bot <img align="right" src="/docs/uconnsmashreal.png" height="200" width="200">
+# UCONN Smash Discord Bot <img align="right" src="/docs/uconnsmashreal.png" height="200" width="200" border-radius="100">
 This is a bot created by [@marwynnsomridhivej](https://github.com/marwynnsomridhivej) to be used **ONLY** in the UCONN Smash Discord server. This bot is not authorised for public use. If you are confused as to what this means, kindly check the [LICENSE](/LICENSE) file.
 
 ## Prefix
