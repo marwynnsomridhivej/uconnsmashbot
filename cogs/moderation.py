@@ -200,7 +200,8 @@ class Moderation(commands.Cog):
                 for item in file[str(ctx.guild.id)][str(member.id)]['history']:
                     if int(item['moderator']) == ctx.author.id:
                         count += 1
-                        history.append((item['reason'], item['timestamp']))
+                        reason = base64.urlsafe_b64decode(str.encode(item['reason'])).decode("ascii")
+                        history.append((reason, item['timestamp']))
                 warns = [count, history]
         except KeyError:
             return None
@@ -262,6 +263,8 @@ class Moderation(commands.Cog):
                 pass
         except KeyError:
             file.update({str(ctx.guild.id): {}})
+        
+        reason = str(base64.urlsafe_b64encode(reason.encode("ascii")), encoding="utf-8")
         
         try:
             file[str(ctx.guild.id)][str(member.id)]['count'] += 1
