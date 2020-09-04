@@ -5,3 +5,4 @@ aiohttp~=3.6.2
 lavalink~=3.1.2
 python-dotenv~=0.14.0
 dateparser~=0.7.6
+pokepy~=0.6.1
