@@ -108,7 +108,10 @@ class Moderation(commands.Cog):
                                   description=f"{member.mention}, your mute has expired in {guild.name}. Please avoid "
                                   "doing what you were doing to get muted",
                                   color=discord.Color.blue())
-            await member.send(embed=embed)
+            try:
+                await member.send(embed=embed)
+            except (discord.HTTPError, discord.Forbidden):
+                pass
         with open('db/mutes.json', 'r') as f:
             file = json.load(f)
             f.close()
@@ -207,7 +210,7 @@ class Moderation(commands.Cog):
     async def auto_warn_action(self, ctx, member: discord.Member, reason: str, count: int, timestamp):
         count_adj = count + 1
         action = auto_warn_actions[count_adj]
-        title = f"Warning from {ctx.guild.name}"
+        title = f"Warning from {ctx.author.display_name} in {ctx.guild.name}"
         ord_count = num2words((count_adj), to='ordinal_num')
         description = f"{member.mention}, this is your **{ord_count}** warning in {ctx.guild.name}\n\n**Reason:**\n{reason}"
         if not action:
@@ -435,6 +438,8 @@ class Moderation(commands.Cog):
                 await ctx.channel.send(embed=notBanned, delete_after=5)
 
     @commands.command()
+    @commands.has_permissions(ban_members=True)
+    @commands.bot_has_permissions(ban_members=True)
     async def warn(self, ctx, members: commands.Greedy[discord.Member], *, reason="Unspecified"):
         timestamp = datetime.now().timestamp()
         warned_by = ctx.author
@@ -483,7 +488,7 @@ class Moderation(commands.Cog):
                         spell = "times"
                     else:
                         spell = "time"
-                    description += f"**User:** <@{item[0]}\n**Warned:** {item[1]} {spell}\n\n"
+                    description += f"**User:** <@{item[0]}>\n**Warned:** {item[1]} {spell}\n\n"
                 embed = discord.Embed(title="Warnings Given",
                                       description=f"{ctx.author.mention}, here is a list of warnings you have given in "
                                       f"{ctx.guild.name}:\n\n{description}",
@@ -491,6 +496,8 @@ class Moderation(commands.Cog):
         await ctx.channel.send(embed=embed)
 
     @commands.command()
+    @commands.has_permissions(ban_members=True)
+    @commands.bot_has_permissions(ban_members=True)
     async def expunge(self, ctx, member: discord.Member = None):
         if not member:
             embed = discord.Embed(title="No Member Specified",
