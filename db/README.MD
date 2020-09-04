@@ -10,6 +10,6 @@ The files that will be created are as follows:
     - playlists.json*
     - reactionroles.json
     - tags.json*
-    - warns.json
+    - warns.json*
 ```
 \**These files will be created when a specific command is executed for the first time. What I have implemented is a check to see if a file exists, if not, return an error message.*
