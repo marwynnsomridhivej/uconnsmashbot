@@ -21,8 +21,11 @@ token_rx = re.compile(r'[MN]\w{23}.\w{6}.\w{27}')
 if os.path.exists('discord.log'):
     os.remove('discord.log')
 
+async def get_prefix(client, message):
+    extras = ('?')
+    return commands.when_mentioned_or(*extras)(client, message)
 
-client = commands.AutoShardedBot(command_prefix="?", help_command=None, shard_count=1)
+client = commands.AutoShardedBot(command_prefix=get_prefix, help_command=None, shard_count=1)
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
