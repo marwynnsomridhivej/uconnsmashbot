@@ -26,11 +26,21 @@ To simplify things, I've made a chart that tells you what exactly the argument s
 # Cogs
 |Name|Commands|
 |:---:|---|
+|[Actions](#actions)|[`actions`](#actions)|
 |[Help](#help)|[`help`](#help)|
 |[Moderation](#moderation)|[`chatclean`](#chatclean) [`mute`](#mute) [`unmute`](#unmute) [`kick`](#kick) [`ban`](#ban) [`unban`](#unban) [`warn`](#warn) [`offense`](#offense) [`expunge`](#expunge) [`modsonline`](#modsonline)|
 |[Music](#music)|[`join`](#join) [`play`](#play) [`queue`](#queue) [`queueclear`](#queueclear) [`stop`](#stop) [`leave`](#leave) [`volume`](#volume) [`playlist`](#playlist)|
 |[Owner](#owner)|[`load`](#load) [`unload`](#unload) [`reload`](#reload) [`shutdown`](#shutdown)|
 |[Roles](#roles)|[`reactionrole`](#reaction-roles) [`rank`](#rank)|
+
+## Actions
+#### Usage
+> `?actions (actions_name)`
+> `?(actions_name) (@mention)`
+
+#### Special Cases
+- The top only displays the actions help menu, which you can acess help for each action
+- The bottom actually does that action to `@mention`, or makes you do the action if `@mention` is not explicitly specified
 
 ## Help
 #### Usage
