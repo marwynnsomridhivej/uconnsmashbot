@@ -4,6 +4,7 @@ from globalcommands import GlobalCMDS
 import asyncio
 import json
 import re
+import os
 
 gcmds = GlobalCMDS()
 role_names = ["Wi-Fi Warriors", "Netplay $quad", "PP Gang", "Not a UConn Student"]
@@ -28,6 +29,8 @@ class Roles(commands.Cog):
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
+        if not os.path.exists('db/reactionroles.json'):
+            return
         with open('db/reactionroles.json', 'r') as f:
             file = json.load(f)
             f.close()
