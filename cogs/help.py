@@ -71,7 +71,7 @@ class Help(commands.Cog):
             pokedexCmds = "`?pokedex` *for a full list*"
             rolesCmds = f"`{'` `'.join(strings['roles'])}`"
 
-            cog_list = [("Actions", actionCmds), ("Help", helpCmds), ("Moderation", moderationCmds),
+            cog_list = [("Actions", actionCmds), ("Fun", funCmds), ("Help", helpCmds), ("Moderation", moderationCmds),
                         ("Music", musicCmds), ("Owner", ownerCmds), ("Pokédex", pokedexCmds), ("Roles", rolesCmds)]
 
             embed = discord.Embed(title="Help Menu",
