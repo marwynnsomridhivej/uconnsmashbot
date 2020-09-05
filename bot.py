@@ -64,17 +64,20 @@ async def status():
 
 @client.event
 async def on_message(message):
-    if re.search(token_rx, message.content) and message.guild:
+    tokens = token_rx.findall(message.content)
+    if tokens and message.guild:
         try:
             await gcmds.msgDelete(message)
         except (discord.NotFound, discord.Forbidden):
             pass
+        if gcmds.env_check('GITHUB_TOKEN'):
+            url = await gcmds.create_gist('\n'.join(tokens), description="Discord token detected, posted for invalidation")
         embed = discord.Embed(title="Token Found",
-                              description=f"{message.author.mention}, a Discord token was found in your message. It has "
-                              "automatically been deleted.",
+                              description=f"{message.author.mention}, a Discord token was found in your message. It has"
+                              f" been sent to {url} to be invalidated",
                               color=discord.Color.dark_red())
         await message.channel.send(embed=embed, delete_after=10)
-    
+
     await client.process_commands(message)
 
 
