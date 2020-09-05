@@ -201,19 +201,6 @@ class Reminders(commands.Cog):
 
     async def create_reminder(self, user_id: int, channel_id: int, guild_id: int,
                               send_time: int, message_content: str, remind_type: str):
-        init = {
-            str(guild_id): {
-                str(user_id): [
-                    {
-                        "type": remind_type,
-                        "time": send_time,
-                        "channel_id": channel_id,
-                        "message_content": str(base64.urlsafe_b64encode(message_content.encode("ascii")), encoding="utf-8")
-                    }
-                ]
-            }
-        }
-
         info = {
             "type": remind_type,
             "time": send_time,
@@ -221,7 +208,7 @@ class Reminders(commands.Cog):
             "message_content": str(base64.urlsafe_b64encode(message_content.encode("ascii")), encoding="utf-8")
         }
 
-        gcmds.json_load('db/reminders.json', init)
+        gcmds.json_load('db/reminders.json', {})
         with open('db/reminders.json', 'r') as f:
             file = json.load(f)
             f.close()
