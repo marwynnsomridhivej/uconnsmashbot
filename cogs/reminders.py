@@ -53,7 +53,7 @@ class Reminders(commands.Cog):
                             if sleep_time <= 0:
                                 sleep_time = 0
                             await asyncio.create_task(self.send_single(sleep_time, user_id, reminder['channel_id'],
-                                                                       message_content, int(guild), index, file))
+                                                                       message_content, int(guild), index))
                     index += 1
 
     async def send_single(self, sleep_time: float, user_id: int, channel_id: int, message_content: str, guild_id: int,
@@ -68,14 +68,18 @@ class Reminders(commands.Cog):
                                   color=discord.Color.blue())
             await channel.send(f"{user.mention}")
             await channel.send(embed=embed)
+            with open('db/reminders.json', 'r') as f:
+                file = json.load(f)
+                f.close()
             del file[str(guild_id)][str(user_id)][index]
             if len(file[str(guild_id)][str(user_id)]) == 0:
                 del file[str(guild_id)][str(user_id)]
             if len(file[str(guild_id)]) == 0:
                 del file[str(guild_id)]
-            with open('db/reminders.json', 'w') as f:
+            with open('db/reminders.json', 'w') as g:
                 json.dump(file, f, indent=4)
-        except (discord.Forbidden, discord.HTTPException, discord.InvalidData, discord.NotFound):
+                g.close()
+        except (discord.Forbidden, discord.HTTPException, discord.InvalidData, discord.NotFound, KeyError):
             pass
 
     @tasks.loop(seconds=1, count=1)
