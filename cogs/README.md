@@ -27,16 +27,17 @@ To simplify things, I've made a chart that tells you what exactly the argument s
 
 # Cogs
 
-|           Name            | Commands                                                                                                                                                                                      |
-|:-------------------------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|    [Actions](#actions)    | [`actions`](#actions)                                                                                                                                                                         |
-|        [Fun](#fun)        | [`eightball`](#eightball) [`choose`](#choose) [`say`](#say)                                                                                                                                   |
-|       [Help](#help)       | [`help`](#help)                                                                                                                                                                               |
-| [Moderation](#moderation) | [`chatclean`](#chatclean) [`mute`](#mute) [`unmute`](#unmute) [`kick`](#kick) [`ban`](#ban) [`unban`](#unban) [warn](#warn) [offense](#offense) [expunge](#expunge) [modsonline](#modsonline) |
-|      [Music](#music)      | [join](#join) [play](#play) [queue](#queue) [queueclear](#queueclear) [stop](#stop) [leave](#leave) [volume](#volume) [playlist](#playlist)                                                   |
-|      [Owner](#owner)      | [load](#load) [unload](#unload) [reload](#reload) [shutdown](#shutdown)                                                                                                                       |
-|    [Pokédex](#pokédex)    | [pokedex](#pokédex)                                                                                                                                                                           |
-|      [Roles](#roles)      | [reactionrole](#reaction-roles) [rank](#rank)                                                                                                                                                 |
+|           Name            | Commands                                                                                                                                                                          |
+|:-------------------------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|    [Actions](#actions)    | [actions](#actions)                                                                                                                                                               |
+|        [Fun](#fun)        | [eightball](#eightball) [choose](#choose) [say](#say)                                                                                                                             |
+|       [Help](#help)       | [help](#help)                                                                                                                                                                     |
+| [Moderation](#moderation) | [chatclean](#chatclean) [mute](#mute) [unmute](#unmute) [kick](#kick) [ban](#ban) [unban](#unban) [warn](#warn) [offense](#offense) [expunge](#expunge) [modsonline](#modsonline) |
+|      [Music](#music)      | [join](#join) [play](#play) [queue](#queue) [queueclear](#queueclear) [stop](#stop) [leave](#leave) [volume](#volume) [playlist](#playlist)                                       |
+|      [Owner](#owner)      | [load](#load) [unload](#unload) [reload](#reload) [shutdown](#shutdown)                                                                                                           |
+|    [Pokédex](#pokédex)    | [pokedex](#pokédex)                                                                                                                                                               |
+|  [Reminders](#reminders)  | [remind](#remind)                                                                                                                                                                 |
+|      [Roles](#roles)      | [reactionrole](#reaction-roles) [rank](#rank)                                                                                                                                     |
 
 ## Actions
 
@@ -50,30 +51,40 @@ To simplify things, I've made a chart that tells you what exactly the argument s
 * The top only displays the actions help menu, which you can acess help for each action
 * The bottom actually does that action to `@mention` , or makes you do the action if `@mention` is not explicitly specified
 
-
 ## Fun
+
 ### Eightball
+
 #### Usage
+
 > `?eightball [question]`
 
 #### Examples
+
 ![](/docs/8b.jpg)
 
 ### Choose
+
 #### Usage
+
 > `?choose [options]`
 
 #### Examples
+
 ![](/docs/choose.jpg)
 
 #### Special Cases
-- `options` must be delimited by "or"
+
+* `options` must be delimited by "or"
 
 ### Say
+
 #### Usage
+
 > `?say [message]`
 
 #### Examples
+
 ![](/docs/say.jpg)
 
 ## Help
@@ -543,6 +554,27 @@ The playlist commands use interactive panels to allow for easy user input of val
 * This only returns the help command for `option` if specified
 * If `option` is not explicitly specified, it returns the help panel that details all pokédex commands
 
+## Reminders
+
+### Remind
+
+#### Usage
+
+> `?remind (args)`
+
+#### Aliases
+
+ `reminder`
+
+#### Special Cases
+
+* If `args` is not explicitly specified, it returns the help panel that details all reminder commands
+* In order to create a reminder, `args` must contain your reminder and a time in a human readable format
+    - *ex.* `?remind in 2 hours go study`
+* Remind also has subcommands that would go in place of `args`
+    - `?remind edit` - edits a reminder *alias=`-e`*
+    - `?remind delete` - deletes a reminder *aliases=`-rm` `trash`*
+
 ## Roles
 
 ### Reaction Roles
@@ -565,7 +597,7 @@ The playlist commands use interactive panels to allow for easy user input of val
 
 #### Editing a Reaction Roles Panel
 
-> `?reactionrole edit`
+> `?reactionrole edit [messageID]`
 
 ##### Aliases
 
@@ -573,7 +605,7 @@ The playlist commands use interactive panels to allow for easy user input of val
 
 #### Deleting a Reaction Roles Panel
 
-> `?reactionrole delete`
+> `?reactionrole delete [messageID]`
 
 #### Aliases
 

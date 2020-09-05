@@ -1,6 +1,9 @@
 import discord
 from discord.ext import commands
 from datetime import datetime
+from globalcommands import GlobalCMDS
+
+gcmds = GlobalCMDS()
 
 
 class Help(commands.Cog):
@@ -21,7 +24,7 @@ class Help(commands.Cog):
 
         embed = discord.Embed(title=f"{name.title()} Help",
                               color=discord.Color.blue(),
-                              url=f"https://github.com/marwynnsomridhivej/uconnsmashbot/tree/master/cogs#{name.lower()}")
+                              url=f"https://github.com/marwynnsomridhivej/uconnsmashbot/tree/{gcmds.version}/cogs#{name.lower()}")
         embed.add_field(name="Syntax",
                         value=syntax,
                         inline=False)
@@ -69,15 +72,17 @@ class Help(commands.Cog):
             musicCmds = f"`{'` `'.join(strings['music'])}`"
             ownerCmds = f"`{'` `'.join(strings['owner'])}`"
             pokedexCmds = "`?pokedex` *for a full list*"
+            reminderCmds = f"`{'` `'.join(strings['reminders'])}`"
             rolesCmds = f"`{'` `'.join(strings['roles'])}`"
 
             cog_list = [("Actions", actionCmds), ("Fun", funCmds), ("Help", helpCmds), ("Moderation", moderationCmds),
-                        ("Music", musicCmds), ("Owner", ownerCmds), ("Pokédex", pokedexCmds), ("Roles", rolesCmds)]
+                        ("Music", musicCmds), ("Owner", ownerCmds), ("Pokédex", pokedexCmds),
+                        ("Reminders", reminderCmds), ("Roles", rolesCmds)]
 
             embed = discord.Embed(title="Help Menu",
                                   description=f"{ctx.author.mention}, here are all the commands I support:",
                                   color=discord.Color.blue(),
-                                  url="https://github.com/marwynnsomridhivej/uconnsmashbot/tree/master/cogs")
+                                  url=f"https://github.com/marwynnsomridhivej/uconnsmashbot/tree/{gcmds.version}/cogs")
 
             for name, value in cog_list:
                 embed.add_field(name=name,
@@ -298,6 +303,19 @@ class Help(commands.Cog):
         syntax = "`?shutdown`"
         perms = ['bot owner', None]
         return await self.send_help(ctx, syntax, perms=perms)
+    
+    # Reminders
+    @_help.command(aliases=['reminder'])
+    async def remind(self, ctx):
+        syntax = "`?remind (args)`"
+        spec = ("If `args` is not explicitly specified, it returns the help panel that details all reminder commands\n\n"
+                "In order to create a reminder, `args` must contain your reminder and a time in a human readable format ,"
+                " like\n```none\n?remind in 2 hours go study\n```\n"
+                "**Subcommands:**\n"
+                "**Edit:** `?remind edit` - edits a reminder *alias=`-e`*\n"
+                "**Delete:** `?remind delete` - deletes a reminder *aliases=`-rm` `trash`*\n"
+                "*Subcommand arguments replace `args`*")
+        return await self.send_help(ctx, syntax, spec=spec)
 
     # Roles
     @_help.command(aliases=['rr'])
@@ -308,8 +326,8 @@ class Help(commands.Cog):
                 'through inputting the required information for that command\n\n'
                 "**Subcommands:**\n\n"
                 "**Create:**\n`?reactionrole create` *aliases=`-c` `start` `make`* - creates a reaction roles panel\n\n"
-                "**Edit:**\n`?reactionrole edit` *aliases=`-e` `adjust`* - edits an existing reaction roles panel\n\n"
-                "**Delete:**\n`?reactionrole delete` *aliases=`-d` `-rm` `del`* - deletes an existing reaction roles panel")
+                "**Edit:**\n`?reactionrole edit [messageID]` *aliases=`-e` `adjust`* - edits an existing reaction roles panel\n\n"
+                "**Delete:**\n`?reactionrole delete [messageID]` *aliases=`-d` `-rm` `del`* - deletes an existing reaction roles panel")
         return await self.send_help(ctx, syntax, perms=perms, spec=spec)
 
     @_help.command()
