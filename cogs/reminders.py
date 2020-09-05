@@ -57,7 +57,7 @@ class Reminders(commands.Cog):
                     index += 1
 
     async def send_single(self, sleep_time: float, user_id: int, channel_id: int, message_content: str, guild_id: int,
-                          index: int, file: dict):
+                          index: int):
         if sleep_time > 0:
             await asyncio.sleep(sleep_time)
         try:
