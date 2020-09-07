@@ -17,7 +17,7 @@ DISABLED_COGS = ["Blackjack", 'Coinflip', 'Connectfour', 'Oldmaid', 'Slots', 'Un
                  'Reactions', 'Moderation', 'Music', 'Utility']
 DISABLED_COMMANDS = []
 token_rx = re.compile(r'[MN]\w{23}.[\w-]{6}.[\w-]{27}')
-version = f"UCONN Smash Bot {gcmds.version}"
+version = f"USB {gcmds.version}"
 
 if os.path.exists('discord.log'):
     os.remove('discord.log')
