@@ -22,6 +22,7 @@ version = f"UCONN Smash Bot {gcmds.version}"
 if os.path.exists('discord.log'):
     os.remove('discord.log')
 
+
 async def get_prefix(client, message):
     extras = ('?')
     return commands.when_mentioned_or(*extras)(client, message)
@@ -35,12 +36,8 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 
 
-@client.event
-async def on_ready():
-    cogs = [filename[:-3] for filename in os.listdir('./cogs') if filename.endswith(".py")]
-    for cog in sorted(cogs):
-        client.load_extension(f'cogs.{cog}')
-        print(f"Cog \"{cog}\" has been loaded")
+async def client_ready():
+    await client.wait_until_ready()
     hostname = socket.gethostname()
     ip = socket.gethostbyname(hostname)
     print(f"Running {version}")
@@ -143,8 +140,15 @@ def truncate(number: float, decimal_places: int):
     return math.trunc(stepper * number) / stepper
 
 
+cogs = [filename[:-3] for filename in os.listdir('./cogs') if filename.endswith(".py")]
+for cog in sorted(cogs):
+    client.load_extension(f'cogs.{cog}')
+    print(f"Cog \"{cog}\" has been loaded")
+
+
 if not gcmds.init_env():
     sys.exit("Please put your bot's token inside the created .env file")
 load_dotenv()
+client.loop.create_task(client_ready())
 token = os.getenv('TOKEN')
 client.run(token)

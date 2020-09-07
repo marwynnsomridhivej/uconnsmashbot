@@ -28,10 +28,6 @@ class Reminders(commands.Cog):
         self.check_single.cancel()
         self.check_loop.cancel()
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print(f'Cog "{self.qualified_name}" has been loaded')
-
     @tasks.loop(seconds=15)
     async def check_single(self):
         with open('db/reminders.json', 'r') as f:

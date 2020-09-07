@@ -25,10 +25,6 @@ class Moderation(commands.Cog):
     def cog_unload(self):
         self.check_mute_expire.cancel()
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print(f'Cog "{self.qualified_name}" has been loaded')
-
     @tasks.loop(seconds=60)
     async def check_mute_expire(self):
         current_time = int(datetime.now().timestamp())

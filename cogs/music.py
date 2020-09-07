@@ -18,24 +18,23 @@ class Music(commands.Cog):
     def __init__(self, client):
         self.client = client
         self.info = {}
+        self.client.loop.create_task(self.lavalink_setup())
 
-        if not hasattr(client, 'lavalink'):
+    async def lavalink_setup(self):
+        await self.client.wait_until_ready()
+        if not hasattr(self.client, 'lavalink'):
             ip = gcmds.env_check("LAVALINK_IP")
             port = gcmds.env_check("LAVALINK_PORT")
             password = gcmds.env_check("LAVALINK_PASSWORD")
             if not ip or not port or not password:
                 print("Make sure your server IP, port, and password are in the .env file")
             else:
-                client.lavalink = lavalink.Client(client.user.id)
-                client.lavalink.add_node(ip, port, password, 'na', 'default-node', name="lavalink")
-                client.add_listener(client.lavalink.voice_update_handler, 'on_socket_response')
+                self.client.lavalink = lavalink.Client(self.client.user.id)
+                self.client.lavalink.add_node(ip, port, password, 'na', 'default-node', name="lavalink")
+                self.client.add_listener(self.client.lavalink.voice_update_handler, 'on_socket_response')
 
         lavalink.add_event_hook(self.track_hook)
         lavalink.add_event_hook(self.update_play)
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print(f'Cog "{self.qualified_name}" has been loaded')
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):

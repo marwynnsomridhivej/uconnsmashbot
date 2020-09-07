@@ -14,10 +14,6 @@ class Actions(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print(f'Cog "{self.qualified_name}" has been loaded')
-
     async def get_count_user(self, ctx, user):
         try:
             user = await converter.convert(ctx, user)
