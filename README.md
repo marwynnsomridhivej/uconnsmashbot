@@ -1,6 +1,6 @@
 # UCONN Smash Discord Bot <img align="right" src="/docs/uconnsmashreal.png" height="200" width="200" border-radius="100">![versionbadge](https://img.shields.io/badge/UCONN%20Smash%20Bot-v1.0.0-brightgreen)
 
-This is a bot created by [@marwynnsomridhivej](https://github.com/marwynnsomridhivej) to be used **ONLY** in the UCONN Smash Discord server. This bot is not authorised for public use. If you are confused as to what this means, kindly check the [LICENSE](/LICENSE) file.
+This is a bot created by [@marwynnsomridhivej](https://github.com/marwynnsomridhivej) to be used **ONLY** in the UCONN Smash Discord server. This bot is not authorised for public use. You will be unable to invite this bot to your discord server, since it is not public. However, since this source code is public, you are free to do whatever you please as long as it is in accordance with the [license](/LICENSE)
 
 ## Prefix
 
