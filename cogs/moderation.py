@@ -48,7 +48,7 @@ class Moderation(commands.Cog):
                 sleep_time = int(time - current_time)
                 if sleep_time > 60:
                     continue
-                await asyncio.create_task(self.unmute_user(int(guild_id), int(user_id), sleep_time))
+                self.client.loop.create_task(self.unmute_user(int(guild_id), int(user_id), sleep_time))
 
     async def check_panel(self, panel: discord.Message) -> bool:
         try:

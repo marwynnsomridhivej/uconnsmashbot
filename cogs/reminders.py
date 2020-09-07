@@ -52,7 +52,7 @@ class Reminders(commands.Cog):
                                 datetime.now().timestamp()
                             if sleep_time <= 0:
                                 sleep_time = 0
-                            await asyncio.create_task(self.send_single(sleep_time, user_id, reminder['channel_id'],
+                            self.client.loop.create_task(self.send_single(sleep_time, user_id, reminder['channel_id'],
                                                                        message_content, int(guild), index))
                     index += 1
 
@@ -94,7 +94,7 @@ class Reminders(commands.Cog):
                         message_content_ascii = base64.urlsafe_b64decode(
                             str.encode(reminder['message_content']))
                         message_content = message_content_ascii.decode("ascii")
-                        await asyncio.create_task(self.send_loop(reminder['time'], int(user), reminder['channel_id'],
+                        self.client.loop.create_task(self.send_loop(reminder['time'], int(user), reminder['channel_id'],
                                                                  message_content, int(guild)))
 
     async def send_loop(self, loop_interval: int, user_id: int, channel_id: int, message_content: str, guild_id: int):
@@ -223,7 +223,7 @@ class Reminders(commands.Cog):
         with open('db/reminders.json', 'w') as g:
             json.dump(file, g, indent=4)
 
-        await asyncio.create_task(self.send_loop(send_time, user_id, channel_id, message_content, guild_id))
+        self.client.loop.create_task(self.send_loop(send_time, user_id, channel_id, message_content, guild_id))
 
     async def get_reminders(self, guild_id: int, user_id: int) -> str:
         if not os.path.exists('db/reminders.json'):
