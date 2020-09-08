@@ -1,4 +1,4 @@
-git+https://github.com/Rapptz/discord.py.git
+discord.py[voice]==1.4.1
 numpy==1.19.1
 num2words==0.5.10
 aiohttp~=3.6.2
