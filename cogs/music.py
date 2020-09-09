@@ -65,7 +65,7 @@ class Music(commands.Cog):
                                                 description=f"{user.mention}, I have stoppped the music player and "
                                                             f"cleared the queue",
                                                 color=discord.Color.blue())
-                        stopped.set_footer(text=f"Executed by {user.display_name} " + \
+                        stopped.set_footer(text=f"Executed by {user.display_name} " +
                                                 "at: {:%m/%d/%Y %H:%M:%S}".format(datetime.now()))
                         await reaction.message.channel.send(embed=stopped, delete_after=5)
                     if reaction.emoji == "⏪":
@@ -111,7 +111,7 @@ class Music(commands.Cog):
                         pauseEmbed = discord.Embed(title=f"Player {pause}",
                                                    description=f"{user.mention}, the player has been {pause.lower()}",
                                                    color=discord.Color.blue())
-                        pauseEmbed.set_footer(text=f"Executed by {user.display_name} " + \
+                        pauseEmbed.set_footer(text=f"Executed by {user.display_name} " +
                                                    "at: {:%m/%d/%Y %H:%M:%S}".format(datetime.now()))
                         try:
                             await paused_message.edit(embed=pauseEmbed, delete_after=5)
@@ -133,7 +133,7 @@ class Music(commands.Cog):
                                                     description=f"{user.mention}, I have skipped to the next track in "
                                                                 f"queue\n\n{vid_info}",
                                                     color=discord.Color.blue())
-                            skipped.set_footer(text=f"Executed by {user.display_name} " + \
+                            skipped.set_footer(text=f"Executed by {user.display_name} " +
                                                     "at: {:%m/%d/%Y %H:%M:%S}".format(datetime.now()))
                         await reaction.message.channel.send(embed=skipped, delete_after=5)
 
@@ -156,7 +156,6 @@ class Music(commands.Cog):
     def save_playlist(self, ctx, key: str, value: list):
         with open('db/db/playlists.json', 'r') as f:
             file = json.load(f)
-            f.close()
 
         try:
             file[str(ctx.author.id)][str(key)]['urls'] = value
@@ -170,7 +169,6 @@ class Music(commands.Cog):
     def append_playlist(self, ctx, key: str, value):
         with open('db/db/playlists.json', 'r') as f:
             file = json.load(f)
-            f.close()
 
         current_urls = file[str(ctx.author.id)][str(key)]['urls']
         if isinstance(value, str):
@@ -195,7 +193,7 @@ class Music(commands.Cog):
                 info = (name, urls)
             else:
                 info = [(item, file[str(ctx.author.id)][item]['urls']) for item in file[str(ctx.author.id)].keys()]
-            f.close()
+
         return info
 
     def check_playlist(self, ctx, key: str):
@@ -906,7 +904,7 @@ class Music(commands.Cog):
                 except discord.NotFound:
                     return await ctx.channel.send(embed=no_panel, delete_after=5)
                 choice = await self.client.wait_for("reaction_add", check=reaction_check,
-                                                                timeout=30)
+                                                    timeout=30)
             except asyncio.TimeoutError:
                 timeout = discord.Embed(title="Save Request Timed Out",
                                         description=f"{ctx.author.mention}, your save request timed out. Please try again",
@@ -1004,7 +1002,7 @@ class Music(commands.Cog):
             while True:
                 try:
                     name_reply = await self.client.wait_for("message", check=from_user,
-                                                                        timeout=30)
+                                                            timeout=30)
                 except asyncio.TimeoutError:
                     timeout = discord.Embed(title="Save Request Timed Out",
                                             description=f"{ctx.author.mention}, you did not specify a name within the "
@@ -1238,7 +1236,7 @@ class Music(commands.Cog):
                 except discord.NotFound:
                     return await ctx.channel.send(embed=no_panel, delete_after=5)
                 reacted = await self.client.wait_for("reaction_add", check=reaction_check,
-                                                                 timeout=30)
+                                                     timeout=30)
             except asyncio.TimeoutError:
                 timeout = discord.Embed(title="Remove Request Timed Out",
                                         description=f"{ctx.author.mention}, you did not react within the time limit",

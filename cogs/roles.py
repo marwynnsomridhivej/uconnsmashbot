@@ -18,6 +18,7 @@ gcmds.json_load('db/reactionroles.json', {})
 with open('db/reactionroles.json', 'r') as rr:
     rr_json = json.load(rr)
 
+
 class Roles(commands.Cog):
 
     def __init__(self, client):
@@ -29,7 +30,7 @@ class Roles(commands.Cog):
             return
         with open('db/reactionroles.json', 'r') as f:
             file = json.load(f)
-            f.close()
+
         member = payload.member
         if not member:
             return
@@ -73,7 +74,7 @@ class Roles(commands.Cog):
     async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
         with open('db/reactionroles.json', 'r') as f:
             file = json.load(f)
-            f.close()
+
         guild_id = payload.guild_id
         guild = await commands.AutoShardedBot.fetch_guild(self.client, guild_id)
         member_id = payload.user_id
@@ -171,7 +172,7 @@ class Roles(commands.Cog):
         gcmds.json_load('db/reactionroles.json', init)
         with open('db/reactionroles.json', 'r') as f:
             file = json.load(f)
-            f.close()
+
         file.update({str(ctx.guild.id): {}})
         file.update({str(ctx.guild.id): {str(rr_message.id): {}}})
         file[str(ctx.guild.id)].update({str(rr_message.id): {"type": type_name, "author": str(ctx.author.id),
@@ -201,7 +202,6 @@ class Roles(commands.Cog):
         if emoji_list or emoji_role_list or type_name:
             with open('db/reactionroles.json', 'r') as f:
                 file = json.load(f)
-                f.close()
 
         if emoji_list and emoji_role_list:
             await message.clear_reactions()
@@ -216,7 +216,7 @@ class Roles(commands.Cog):
     async def check_rr_author(self, message_id: int, user_id: int, guild_id: int) -> bool:
         with open('db/reactionroles.json', 'r') as f:
             file = json.load(f)
-            f.close()
+
         try:
             if file[str(guild_id)][str(message_id)]['author'] == str(user_id):
                 return True
@@ -228,7 +228,7 @@ class Roles(commands.Cog):
     async def check_rr_exists(self, ctx, message_id: int, guild_id: int):
         with open('db/reactionroles.json', 'r') as f:
             file = json.load(f)
-            f.close()
+
         try:
             if str(message_id) in file[str(guild_id)].keys() and await self.get_rr_info(ctx, message_id):
                 return True
@@ -279,7 +279,7 @@ class Roles(commands.Cog):
 
             with open('db/reactionroles.json', 'r') as f:
                 file = json.load(f)
-                f.close()
+
             try:
                 del file[str(guild_id)][str(message_id)]
                 if len(file[str(guild_id)]) == 0:
@@ -296,7 +296,7 @@ class Roles(commands.Cog):
     async def get_rr_type(self, message_id: int, guild_id: int) -> str:
         with open('db/reactionroles.json', 'r') as f:
             file = json.load(f)
-            f.close()
+
         return file[str(guild_id)][str(message_id)]['type'].replace("_", " ").title()
 
     @commands.group(aliases=['rr'])
@@ -370,7 +370,7 @@ class Roles(commands.Cog):
                                       description=f"{ctx.author.mention}, please tag the channel you would like the "
                                                   f"embed to be sent in (or type its ID)")
                 result = await self.client.wait_for("message", check=from_user,
-                                                                timeout=timeout)
+                                                    timeout=timeout)
             except asyncio.TimeoutError:
                 return await self.timeout(ctx, timeout, panel)
             if not re.match(channel_tag_rx, result.content):
@@ -435,7 +435,7 @@ class Roles(commands.Cog):
                                       description=f"{ctx.author.mention}, please enter the hex color of the embed "
                                                   f"that will be sent")
                 result = await self.client.wait_for("message", check=from_user,
-                                                                timeout=timeout)
+                                                    timeout=timeout)
             except asyncio.TimeoutError:
                 return await self.timeout(ctx, timeout, panel)
             if not re.match(hex_color_rx, result.content):
@@ -461,7 +461,7 @@ class Roles(commands.Cog):
                                           description=f"{ctx.author.mention}, please tag the role you would like to be "
                                                       f"added into the reaction role or type *finish* to finish setup")
                     result = await self.client.wait_for("message", check=from_user,
-                                                                    timeout=timeout)
+                                                        timeout=timeout)
                 except asyncio.TimeoutError:
                     return await self.timeout(ctx, timeout, panel)
                 if not re.match(role_tag_rx, result.content):
@@ -489,7 +489,7 @@ class Roles(commands.Cog):
                                           description=f"{ctx.author.mention}, please react to this panel with the emoji"
                                                       f" you want the user to react with to get the role <@&{role}>")
                     result = await self.client.wait_for("reaction_add", check=panel_react,
-                                                                    timeout=timeout)
+                                                        timeout=timeout)
                 except asyncio.TimeoutError:
                     return await self.timeout(ctx, timeout, panel)
                 if result[0].emoji in emoji_list:
@@ -520,7 +520,7 @@ class Roles(commands.Cog):
                                                   f" role at a time)*\n\n"
                                                   f"*If I wanted to pick `Normal`, I would type \"1\" as the response*")
                 result = await self.client.wait_for("message", check=from_user,
-                                                                timeout=timeout)
+                                                    timeout=timeout)
             except asyncio.TimeoutError:
                 return await self.timeout(ctx, timeout, panel)
             else:
@@ -622,7 +622,7 @@ class Roles(commands.Cog):
                                               f"embed, or enter *\"skip\"* to keep the current "
                                               f"description\n\n**Current Description:**\n{old_embed.description}")
             result = await self.client.wait_for("message", check=from_user,
-                                                            timeout=timeout)
+                                                timeout=timeout)
         except asyncio.TimeoutError:
             return await self.timeout(ctx, timeout, panel)
         else:
@@ -645,7 +645,7 @@ class Roles(commands.Cog):
                                                   f"embed, or enter *\"skip\"* to keep the current "
                                                   f"color\n\n**Current Color:**\n{str(old_embed.color)}")
                 result = await self.client.wait_for("message", check=from_user,
-                                                                timeout=timeout)
+                                                    timeout=timeout)
             except asyncio.TimeoutError:
                 return await self.timeout(ctx, timeout, panel)
             if not re.match(hex_color_rx, result.content):
@@ -675,7 +675,7 @@ class Roles(commands.Cog):
                                                       f"added into the reaction role, type *finish* to finish setup, "
                                                       f"or type *skip* to keep the current roles and reactions")
                     result = await self.client.wait_for("message", check=from_user,
-                                                                    timeout=timeout)
+                                                        timeout=timeout)
                 except asyncio.TimeoutError:
                     return await self.timeout(ctx, timeout, panel)
                 if not re.match(role_tag_rx, result.content):
@@ -705,8 +705,8 @@ class Roles(commands.Cog):
                                           description=f"{ctx.author.mention}, please react to this panel with the emoji"
                                                       f" you want the user to react with to get the role <@&{role}>")
                     result = await self.client.wait_for("reaction_add",
-                                                                    check=panel_react,
-                                                                    timeout=timeout)
+                                                        check=panel_react,
+                                                        timeout=timeout)
                 except asyncio.TimeoutError:
                     return await self.timeout(ctx, timeout, panel)
                 if result[0].emoji in emoji_list:
@@ -743,7 +743,7 @@ class Roles(commands.Cog):
                                                   f" role at a time)*\n\n"
                                                   f"*If I wanted to pick `Normal`, I would type \"1\" as the response*")
                 result = await self.client.wait_for("message", check=from_user,
-                                                                timeout=timeout)
+                                                    timeout=timeout)
             except asyncio.TimeoutError:
                 return await self.timeout(ctx, timeout, panel)
             else:
@@ -807,14 +807,15 @@ class Roles(commands.Cog):
             if role not in ctx.author.roles:
                 await ctx.author.add_roles(role)
                 embed = discord.Embed(title="Role Added",
-                                    description=f"{ctx.author.mention}, you have been given the {role.mention} role",
-                                    color=discord.Color.blue())
+                                      description=f"{ctx.author.mention}, you have been given the {role.mention} role",
+                                      color=discord.Color.blue())
             else:
                 await ctx.author.remove_roles(role)
                 embed = discord.Embed(title="Role Removed",
                                       description=f"{ctx.author.mention}, you are no longer in {role.mention}",
                                       color=discord.Color.dark_red())
         return await ctx.channel.send(embed=embed)
+
 
 def setup(client):
     client.add_cog(Roles(client))

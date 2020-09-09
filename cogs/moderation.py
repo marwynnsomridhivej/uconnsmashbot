@@ -33,7 +33,7 @@ class Moderation(commands.Cog):
 
         with open('db/mutes.json', 'r') as f:
             file = json.load(f)
-            f.close()
+
         for guild_id in file:
             if not file[guild_id]:
                 continue
@@ -84,8 +84,8 @@ class Moderation(commands.Cog):
             if not color:
                 color = panel_embed.color
             embed = discord.Embed(title=title,
-                                description=description,
-                                color=color)
+                                  description=description,
+                                  color=color)
             await panel.edit(embed=embed)
             return True
         except (discord.NotFound, discord.Forbidden, discord.HTTPError):
@@ -110,14 +110,14 @@ class Moderation(commands.Cog):
                 pass
         with open('db/mutes.json', 'r') as f:
             file = json.load(f)
-            f.close()
+
         try:
             del file[str(guild_id)][str(user_id)]
         except KeyError:
             pass
         with open('db/mutes.json', 'w') as g:
             json.dump(file, g, indent=4)
-            g.close()
+
         return
 
     async def set_mute(self, ctx, member: discord.Member, time: int = None):
@@ -131,13 +131,12 @@ class Moderation(commands.Cog):
         gcmds.json_load('db/mutes.json', init)
         with open('db/mutes.json', 'r') as f:
             file = json.load(f)
-            f.close()
+
         file.update({str(ctx.guild.id): {}})
         file[str(ctx.guild.id)].update({str(member.id): {}})
         file[str(ctx.guild.id)][str(member.id)].update({'time': time})
         with open('db/mutes.json', 'w') as g:
             json.dump(file, g, indent=4)
-            g.close()
 
     async def get_warns(self, ctx, members) -> list:
         if not os.path.exists('db/warns.json'):
@@ -145,7 +144,7 @@ class Moderation(commands.Cog):
 
         with open('db/warns.json', 'r') as f:
             file = json.load(f)
-            f.close()
+
         warns = []
         for member in members:
             try:
@@ -158,7 +157,7 @@ class Moderation(commands.Cog):
         try:
             with open('db/warns.json', 'r') as f:
                 file = json.load(f)
-                f.close()
+
             if isinstance(index, str):
                 del file[str(ctx.guild.id)][str(member.id)]
             else:
@@ -179,7 +178,6 @@ class Moderation(commands.Cog):
             return None
         with open('db/warns.json', 'r') as f:
             file = json.load(f)
-            f.close()
 
         warns = []
         count = 0
@@ -253,15 +251,15 @@ class Moderation(commands.Cog):
             gcmds.json_load('db/warns.json', {})
         with open('db/warns.json', 'r') as f:
             file = json.load(f)
-            f.close()
+
         try:
             if file[str(ctx.guild.id)]:
                 pass
         except KeyError:
             file.update({str(ctx.guild.id): {}})
-        
+
         reason = str(base64.urlsafe_b64encode(reason.encode("ascii")), encoding="utf-8")
-        
+
         try:
             file[str(ctx.guild.id)][str(member.id)]['count'] += 1
             file[str(ctx.guild.id)][str(member.id)]['history'].append(
@@ -274,7 +272,6 @@ class Moderation(commands.Cog):
 
         with open('db/warns.json', 'w') as g:
             json.dump(file, g, indent=4)
-            g.close()
 
     @commands.command(aliases=['clear', 'clean', 'chatclear', 'cleanchat', 'clearchat', 'purge'])
     @commands.has_permissions(manage_messages=True)
@@ -517,17 +514,17 @@ class Moderation(commands.Cog):
         administered.pop(0)
         print(administered)
         for reason, timestamp in administered[0]:
-                    formatted_time = "{:%m/%d/%Y %H:%M:%S}".format(datetime.fromtimestamp(timestamp))
-                    records += f"**{index}:**\n**Time: ** {formatted_time}\n**Reason:** {reason}\n\n"
-                    index += 1
+            formatted_time = "{:%m/%d/%Y %H:%M:%S}".format(datetime.fromtimestamp(timestamp))
+            records += f"**{index}:**\n**Time: ** {formatted_time}\n**Reason:** {reason}\n\n"
+            index += 1
         panel_embed = discord.Embed(title="Expunge Warn Records",
                                     description=f"{ctx.author.mention}, please type the number of the record you would "
                                     f"like to expunge, or enter \"all\" to expunge all\n\n{records}",
                                     color=discord.Color.blue())
         panel_embed.set_footer(text='Type "cancel" to cancel')
-        
+
         panel = await ctx.channel.send(embed=panel_embed)
-        
+
         def from_user(message: discord.Message) -> bool:
             if message.author.id == ctx.author.id and message.channel.id == ctx.channel.id:
                 return True

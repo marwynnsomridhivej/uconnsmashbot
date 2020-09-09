@@ -32,7 +32,7 @@ class Reminders(commands.Cog):
     async def check_single(self):
         with open('db/reminders.json', 'r') as f:
             file = json.load(f)
-            f.close()
+
         for guild in file:
             for user in file[str(guild)]:
                 index = 0
@@ -49,7 +49,7 @@ class Reminders(commands.Cog):
                             if sleep_time <= 0:
                                 sleep_time = 0
                             self.client.loop.create_task(self.send_single(sleep_time, user_id, reminder['channel_id'],
-                                                                       message_content, int(guild), index))
+                                                                          message_content, int(guild), index))
                     index += 1
 
     async def send_single(self, sleep_time: float, user_id: int, channel_id: int, message_content: str, guild_id: int,
@@ -66,7 +66,7 @@ class Reminders(commands.Cog):
             await channel.send(embed=embed)
             with open('db/reminders.json', 'r') as f:
                 file = json.load(f)
-                f.close()
+
             del file[str(guild_id)][str(user_id)][index]
             if len(file[str(guild_id)][str(user_id)]) == 0:
                 del file[str(guild_id)][str(user_id)]
@@ -74,7 +74,7 @@ class Reminders(commands.Cog):
                 del file[str(guild_id)]
             with open('db/reminders.json', 'w') as g:
                 json.dump(file, f, indent=4)
-                g.close()
+
         except (discord.Forbidden, discord.HTTPException, discord.InvalidData, discord.NotFound, KeyError):
             pass
 
@@ -82,7 +82,7 @@ class Reminders(commands.Cog):
     async def check_loop(self):
         with open('db/reminders.json', 'r') as f:
             file = json.load(f)
-            f.close()
+
         for guild in file:
             for user in file[str(guild)]:
                 for reminder in file[str(guild)][str(user)]:
@@ -91,7 +91,7 @@ class Reminders(commands.Cog):
                             str.encode(reminder['message_content']))
                         message_content = message_content_ascii.decode("ascii")
                         self.client.loop.create_task(self.send_loop(reminder['time'], int(user), reminder['channel_id'],
-                                                                 message_content, int(guild)))
+                                                                    message_content, int(guild)))
 
     async def send_loop(self, loop_interval: int, user_id: int, channel_id: int, message_content: str, guild_id: int):
         while True:
@@ -126,17 +126,17 @@ class Reminders(commands.Cog):
                         value=f"Usage: `?remind edit`\n"
                               f"Returns: An interactive reminder edit panel\n"
                               f"Aliases: `-e`\n"
-                              f"Special Cases: You must have at least one reminder queued\n\n*An error may occur if the " \
-                              f"reminder fires while you are in the middle of editing it. It may also end up firing " \
+                              f"Special Cases: You must have at least one reminder queued\n\n*An error may occur if the "
+                              f"reminder fires while you are in the middle of editing it. It may also end up firing "
                               f"twice if you edit it within 15 seconds of it's firing time*",
                         inline=False)
         embed.add_field(name="Delete",
                         value=f"Usage: `?remind delete`\n"
                         f"Returns: An interactive reminder delete panel\n"
                         f"Aliases: `-rm` `trash`\n"
-                        f"Special Cases: You must have at least one reminder queued in that server\n\n*An error may " \
-                        f"occur if the reminder fires while you are in the middle of deleting it. If you proceed, it " \
-                        f"may display that the deletion was unsuccessful. It's entry has already been deleted from " \
+                        f"Special Cases: You must have at least one reminder queued in that server\n\n*An error may "
+                        f"occur if the reminder fires while you are in the middle of deleting it. If you proceed, it "
+                        f"may display that the deletion was unsuccessful. It's entry has already been deleted from "
                         f"the database after it was fired*")
         return await ctx.channel.send(embed=embed)
 
@@ -165,7 +165,7 @@ class Reminders(commands.Cog):
             description = panel_embed.description
         if not color:
             color = discord.Color.blue()
-            
+
         panel_embed_edited = discord.Embed(title=title,
                                            description=description,
                                            color=color)
@@ -207,7 +207,7 @@ class Reminders(commands.Cog):
         gcmds.json_load('db/reminders.json', {})
         with open('db/reminders.json', 'r') as f:
             file = json.load(f)
-            f.close()
+
         while True:
             try:
                 file[str(guild_id)][str(user_id)].append(info)
@@ -227,7 +227,6 @@ class Reminders(commands.Cog):
 
         with open('db/reminders.json', 'r') as f:
             file = json.load(f)
-            f.close()
 
         index = 1
         string = ""
@@ -271,7 +270,6 @@ class Reminders(commands.Cog):
     async def get_reminder_time(self, guild_id: int, user_id: int, index: int) -> str:
         with open('db/reminders.json', 'r') as f:
             file = json.load(f)
-            f.close()
 
         if file[str(guild_id)][str(user_id)][index]['type'] == "single":
             return datetime.fromtimestamp(file[str(guild_id)][str(user_id)][index]['time']).strftime("%m/%d/%Y %H:%M:%S UTC")
@@ -304,14 +302,12 @@ class Reminders(commands.Cog):
     async def get_reminder_type(self, guild_id: int, user_id: int, index: int) -> str:
         with open('db/reminders.json', 'r') as f:
             file = json.load(f)
-            f.close()
 
         return file[str(guild_id)][str(user_id)][index]['type']
 
     async def get_reminder_content(self, guild_id: int, user_id: int, index: int) -> str:
         with open('db/reminders.json', 'r') as f:
             file = json.load(f)
-            f.close()
 
         content_ascii = base64.urlsafe_b64decode(str.encode(
             file[str(guild_id)][str(user_id)][index]['message_content']))
@@ -322,7 +318,6 @@ class Reminders(commands.Cog):
     async def get_reminder_channel(self, guild_id: int, user_id: int, index: int) -> int:
         with open('db/reminders.json', 'r') as f:
             file = json.load(f)
-            f.close()
 
         return int(file[str(guild_id)][str(user_id)][index]['channel_id'])
 
@@ -331,7 +326,7 @@ class Reminders(commands.Cog):
         try:
             with open('db/reminders.json', 'r') as f:
                 file = json.load(f)
-                f.close()
+
             info = file[str(guild_id)][str(user_id)][index]
             if channel_id:
                 info['channel_id'] = channel_id
@@ -342,7 +337,7 @@ class Reminders(commands.Cog):
                     edited_content.encode("ascii")), encoding="utf-8")
             with open('db/reminders.json', 'w') as g:
                 json.dump(file, g, indent=4)
-                g.close()
+
             return True
         except KeyError:
             return False
@@ -351,17 +346,17 @@ class Reminders(commands.Cog):
         try:
             with open('db/reminders.json', 'r') as f:
                 file = json.load(f)
-                f.close()
+
             if index:
                 del file[str(guild_id)][str(user_id)][index]
                 if len(file[str(guild_id)][str(user_id)]) == 0:
                     del file[str(guild_id)][str(user_id)]
             else:
                 del file[str(guild_id)][str(user_id)]
-                    
+
             if len(file[str(guild_id)]) == 0:
-                    del file[str(guild_id)]
-                    
+                del file[str(guild_id)]
+
             with open('db/reminders.json', 'w') as g:
                 json.dump(file, g, indent=4)
             return True
@@ -380,7 +375,6 @@ class Reminders(commands.Cog):
             await ctx.invoke(self.delete)
             return
 
-        
         dates = search_dates(text=message_with_time, settings={
                              'PREFER_DATES_FROM': "future"})
         current_time = datetime.now().timestamp()
@@ -411,7 +405,7 @@ class Reminders(commands.Cog):
 
         try:
             result = await self.client.wait_for("reaction_add", check=reacted_user,
-                                                            timeout=timeout)
+                                                timeout=timeout)
         except asyncio.TimeoutError:
             return await self.timeout(ctx)
         reaction = result[0].emoji
