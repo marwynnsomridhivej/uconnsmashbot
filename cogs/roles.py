@@ -14,7 +14,7 @@ channel_tag_rx = re.compile(r'<#[0-9]{18}>')
 channel_id_rx = re.compile(r'[0-9]{18}')
 role_tag_rx = re.compile(r'<@&[0-9]{18}>')
 hex_color_rx = re.compile(r'#[A-Fa-f0-9]{6}')
-timeout = 60
+timeout = 180
 
 
 class Roles(commands.Cog):
@@ -161,11 +161,9 @@ class Roles(commands.Cog):
                               color=discord.Color.dark_red())
         return await ctx.channel.send(embed=embed)
 
-    async def send_rr_message(self, ctx, channel: discord.TextChannel, send_embed: discord.Embed, emoji_list: list,
+    async def send_rr_message(self, ctx, channel: discord.TextChannel, send_embed: discord.Embed,
                               role_emoji: list, type_name: str):
         rr_message = await channel.send(embed=send_embed)
-        for emoji in emoji_list:
-            await rr_message.add_reaction(emoji)
         init = {str(ctx.guild.id): {str(rr_message.id): {"type": type_name, "details": []}}}
         gcmds.json_load('db/reactionroles.json', init)
         with open('db/reactionroles.json', 'r') as f:
@@ -176,12 +174,13 @@ class Roles(commands.Cog):
         file[str(ctx.guild.id)].update({str(rr_message.id): {"type": type_name, "author": str(ctx.author.id),
                                                              "details": []}})
         for role, emoji in role_emoji:
+            await rr_message.add_reaction(emoji)
             file[str(ctx.guild.id)][str(rr_message.id)]['details'].append({"role_id": str(role), "emoji": str(emoji)})
         with open('db/reactionroles.json', 'w') as g:
             json.dump(file, g, indent=4)
 
     async def edit_rr_message(self, ctx, message_id: int, guild_id: int, title: str, description: str, color: str,
-                              emoji_list, emoji_role_list, type_name):
+                              emoji_role_list, type_name):
         for text_channel in ctx.guild.text_channels:
             try:
                 message = await text_channel.fetch_message(message_id)
@@ -197,19 +196,21 @@ class Roles(commands.Cog):
         except discord.NotFound:
             return await self.failure(ctx, "edit")
 
-        if emoji_list or emoji_role_list or type_name:
+        if emoji_role_list or type_name:
             with open('db/reactionroles.json', 'r') as f:
                 file = json.load(f)
 
-        if emoji_list and emoji_role_list:
+        if emoji_role_list:
             await message.clear_reactions()
-            for emoji in emoji_list:
-                await message.add_reaction(emoji)
-            file[str(guild_id)][str(message_id)]['details'] = []
+            file[str(ctx.guild.id)][str(message_id)]['details'] = [{"role_id": str(role), "emoji": str(emoji)} for role, emoji in emoji_role_list]
             for role, emoji in emoji_role_list:
-                file[str(ctx.guild.id)][str(message_id)]['details'].append({"role_id": str(role), "emoji": str(emoji)})
+                await message.add_reaction(emoji)
+                
         if type_name:
             file[str(guild_id)][str(message_id)]['type'] = type_name
+
+        with open('db/reactionroles.json', 'w') as g:
+            json.dump(file, g, indent=4)
 
     async def check_rr_author(self, message_id: int, user_id: int, guild_id: int) -> bool:
         with open('db/reactionroles.json', 'r') as f:
@@ -301,6 +302,7 @@ class Roles(commands.Cog):
     @commands.bot_has_permissions(manage_roles=True, add_reactions=True)
     @commands.has_permissions(manage_guild=True)
     async def reactionrole(self, ctx):
+        await gcmds.invkDelete(ctx)
         if not ctx.invoked_subcommand:
             message_id_message = f"The `[messageID]` argument must be the message ID of a reaction " \
                                  f"roles panel that you have created. You will be unable to edit the panel if you " \
@@ -545,7 +547,7 @@ class Roles(commands.Cog):
         rr_embed = discord.Embed(title=title,
                                  description=description,
                                  color=color)
-        return await self.send_rr_message(ctx, channel, rr_embed, emoji_list, emoji_role_list, type_name)
+        return await self.send_rr_message(ctx, channel, rr_embed, emoji_role_list, type_name)
 
     @reactionrole.command(aliases=['adjust', '-e'])
     async def edit(self, ctx, message_id: int = None):
@@ -565,7 +567,7 @@ class Roles(commands.Cog):
             return await ctx.channel.send(embed=not_author, delete_after=10)
 
         panel_embed = discord.Embed(title="Reaction Role Setup Menu",
-                                    description=f"{ctx.author.mention}, welcome to my reaction role setup "
+                                    description=f"{ctx.author.mention}, welcome to MarwynnBot's reaction role setup "
                                                 f"menu. Just follow the prompts to edit your panel!",
                                     color=discord.Color.blue())
         panel_embed.set_footer(text="Type \"cancel\" to cancel at any time")
@@ -656,9 +658,9 @@ class Roles(commands.Cog):
                     continue
             else:
                 color = int(result.content[1:], 16)
-                await result.delete()
                 break
-
+        await result.delete()
+        
         # User will tag the role, then react with the corresponding emoji
         emoji_role_list = []
         emoji_list = []
@@ -669,9 +671,11 @@ class Roles(commands.Cog):
                     if not panel_message:
                         return await self.no_panel(ctx)
                     await self.edit_panel(panel_embed, panel_message, title=None,
-                                          description=f"{ctx.author.mention}, please tag the role you would like to be "
-                                                      f"added into the reaction role, type *finish* to finish setup, "
-                                                      f"or type *skip* to keep the current roles and reactions")
+                                          description=f"{ctx.author.mention}, please tag the role you would like the "
+                                          "reaction role panel to have, type *finish* to finish setup, "
+                                          "or type *skip* to keep the current roles and reactions\n\n**Specifying a "
+                                          "role will not add it to the current list. You must specify all the roles "
+                                          "that this panel should have (including already added roles)**")
                     result = await self.client.wait_for("message", check=from_user,
                                                         timeout=timeout)
                 except asyncio.TimeoutError:
@@ -718,7 +722,7 @@ class Roles(commands.Cog):
 
             emoji_role_list.append((role, emoji))
 
-        if result.content == "skip":
+        if result.content == "skip" or (result.content == "finish" and not emoji_list and not emoji_role_list):
             emoji_list = None
             emoji_role_list = None
 
@@ -770,7 +774,7 @@ class Roles(commands.Cog):
         await self.success(ctx, "edited")
 
         return await self.edit_rr_message(ctx, message_id, ctx.guild.id, title, description,
-                                          color, emoji_list, emoji_role_list, type_name)
+                                          color, emoji_role_list, type_name)
 
     @reactionrole.command(aliases=['-d', '-rm', 'del'])
     async def delete(self, ctx, message_id: int = None):
