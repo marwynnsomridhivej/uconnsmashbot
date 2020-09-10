@@ -20,9 +20,12 @@ class Moderation(commands.Cog):
 
     def __init__(self, client):
         self.client = client
+        self.tasks = []
         self.check_mute_expire.start()
 
     def cog_unload(self):
+        for task in self.tasks:
+            task.cancel()
         self.check_mute_expire.cancel()
 
     @tasks.loop(seconds=60)
@@ -44,7 +47,7 @@ class Moderation(commands.Cog):
                 sleep_time = int(time - current_time)
                 if sleep_time > 60:
                     continue
-                self.client.loop.create_task(self.unmute_user(int(guild_id), int(user_id), sleep_time))
+                self.tasks.append(self.client.loop.create_task(self.unmute_user(int(guild_id), int(user_id), sleep_time)))
 
     async def check_panel(self, panel: discord.Message) -> bool:
         try:
