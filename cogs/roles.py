@@ -169,7 +169,8 @@ class Roles(commands.Cog):
         with open('db/reactionroles.json', 'r') as f:
             file = json.load(f)
 
-        file.update({str(ctx.guild.id): {}})
+        if not str(ctx.guild.id) in file.keys():
+            file.update({str(ctx.guild.id): {}})
         file.update({str(ctx.guild.id): {str(rr_message.id): {}}})
         file[str(ctx.guild.id)].update({str(rr_message.id): {"type": type_name, "author": str(ctx.author.id),
                                                              "details": []}})
