@@ -450,7 +450,8 @@ class Owner(commands.Cog):
 
     @commands.group(invoke_without_command=True,
                     desc="Displays the premium message",
-                    usage="premium")
+                    usage="premium",
+                    uperms=OWNER_PERM)
     async def premium(self, ctx):
         description = ("UconnSmashBot Premium is an optional, subscription based plan that will grant the subscriber complete, unrestricted "
                        "access to all of UconnSmashBot's \"premium locked\" features, such as creating and saving playlists, receiving special monthly"
