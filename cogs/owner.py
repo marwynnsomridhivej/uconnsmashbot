@@ -448,20 +448,13 @@ class Owner(commands.Cog):
                                    color=discord.Color.blue())
         await ctx.author.send(embed=leaveEmbed)
 
+    @commands.is_owner()
     @commands.group(invoke_without_command=True,
-                    desc="Displays the premium message",
-                    usage="premium",
+                    desc="Not Implemented",
+                    usage="No Implementation",
                     uperms=OWNER_PERM)
     async def premium(self, ctx):
-        description = ("UconnSmashBot Premium is an optional, subscription based plan that will grant the subscriber complete, unrestricted "
-                       "access to all of UconnSmashBot's \"premium locked\" features, such as creating and saving playlists, receiving special monthly"
-                       "balance crates, public tags, unlimited number of tags, a special role in the UconnSmashBot Support Server, and more!\n\n"
-                       "**UconnSmashBot Premium is currently unavailable. This message will update when it becomes available, most likely after UconnSmashBot's"
-                       "v1.0.0-rc.1 release**")
-        embed = discord.Embed(title="UconnSmashBot Premium",
-                              description=description,
-                              color=discord.Color.blue())
-        return await ctx.channel.send(embed=embed)
+        return
 
     @commands.is_owner()
     @premium.group(invoke_without_command=True, aliases=['set', '-s'])
