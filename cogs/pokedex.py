@@ -1,10 +1,12 @@
 import math
+
 import discord
-from discord.ext import commands
 import pokepy
+from discord.ext import commands
+from utils import globalcommands
 
-
-poke_client = pokepy.V2Client(cache='in_disk', cache_location="./pokepy_cache")
+gcmds = globalcommands.GlobalCMDS()
+poke_bot = pokepy.V2Client(cache='in_disk', cache_location="./pokepy_cache")
 move_status_icon_urls = ["https://oyster.ignimgs.com/mediawiki/apis.ign.com/pokemon-switch/e/ef/Physical.png?width=325",
                          "https://oyster.ignimgs.com/mediawiki/apis.ign.com/pokemon-switch/2/24/Special.png?width=325",
                          "https://oyster.ignimgs.com/mediawiki/apis.ign.com/pokemon-switch/d/d0/Status.png?width=325"]
@@ -17,8 +19,10 @@ high quality translations that are actually grammatically correct.
 
 class Pokedex(commands.Cog):
 
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        global gcmds
+        self.bot = bot
+        gcmds = globalcommands.GlobalCMDS(self.bot)
 
     def truncate(self, number: float, decimal_places: int) -> float:
         stepper = 10.0 ** decimal_places
@@ -26,7 +30,7 @@ class Pokedex(commands.Cog):
 
     async def check_pokemon(self, name: str) -> pokepy.api.rv2.PokemonResource:
         try:
-            return poke_client.get_pokemon(name)
+            return poke_bot.get_pokemon(name)
         except Exception:
             return None
 
@@ -69,7 +73,7 @@ class Pokedex(commands.Cog):
 
     async def check_move(self, name: str) -> pokepy.api.rv2.MoveResource:
         try:
-            return poke_client.get_move(name)
+            return poke_bot.get_move(name)
         except Exception:
             return None
 
@@ -107,7 +111,7 @@ class Pokedex(commands.Cog):
 
     async def check_ability(self, name: str) -> pokepy.api.rv2.AbilityResource:
         try:
-            return poke_client.get_ability(name)
+            return poke_bot.get_ability(name)
         except Exception:
             return None
 
@@ -131,7 +135,7 @@ class Pokedex(commands.Cog):
 
     async def check_item(self, name) -> pokepy.api.rv2.ItemResource:
         try:
-            return poke_client.get_item(name)
+            return poke_bot.get_item(name)
         except Exception:
             return None
 
@@ -172,7 +176,7 @@ class Pokedex(commands.Cog):
 
     async def check_type(self, name: str) -> pokepy.api.rv2.TypeResource:
         try:
-            return poke_client.get_type(name)
+            return poke_bot.get_type(name)
         except Exception:
             return None
 
@@ -225,43 +229,45 @@ class Pokedex(commands.Cog):
             type_move_damage_class = f"Damage Class: `{value.move_damage_class.name.capitalize()}`"
         return type_name, type_interactions, type_move_damage_class
 
-    @commands.group(aliases=['dex'])
+    @commands.group(invoke_without_command=True,
+                    aliases=['dex'],
+                    desc="Displays the help command for the pokedex",
+                    usage="pokedex")
     async def pokedex(self, ctx):
-        if not ctx.invoked_subcommand:
-            panel = discord.Embed(title="Pokedex Commands",
-                                  description=f"Access MarwynnBot's Pokédex using `?pokedex "
-                                              f"(option)`. Please note that in order to avoid discrepancies in "
-                                              f"versions, I have not included many of the game specific data.\n Here "
-                                              f"is a list of all available `pokedex` options",
-                                  color=discord.Color.blue())
-            panel.add_field(name="Pokémon",
-                            value=f"Usage: `?pokedex pokemon [name]`\n"
-                                  f"Returns: Details about the specified Pokémon\n"
-                                  f"Aliases: `-p`",
-                            inline=False)
-            panel.add_field(name="Move",
-                            value=f"Usage: `?pokedex move [name]`\n"
-                                  f"Returns: Details about the move\n"
-                                  f"Aliases: `moves` `-m`",
-                            inline=False)
-            panel.add_field(name="Ability",
-                            value=f"Usage: `?pokedex ability [name] [optional flag]`\n"
-                                  f"Returns: Details about the specified ability\n"
-                                  f"Flag: `-de` `-en` or blank *(defaults to english)*\n"
-                                  f"Aliases: `-a`",
-                            inline=False)
-            panel.add_field(name="Item",
-                            value=f"Usage: `? pokedex item [name]`\n"
-                                  f"Returns: Details about the item"
-                                  f"Aliases: `-i`",
-                            inline=False)
-            panel.add_field(name="Type",
-                            value=f"Usage: `?pokedex type [name]`\n"
-                                  f"Returns: Details about that type"
-                                  f"Flag: `-p` `-m` or blank *(defaults to none)*"
-                                  f"Aliases: `-t`",
-                            inline=False)
-            return await ctx.channel.send(embed=panel)
+        panel = discord.Embed(title="Pokedex Commands",
+                              description=f"Access MarwynnBot's Pokédex using `{await gcmds.prefix(ctx)}pokedex "
+                              f"[option]`. Please note that in order to avoid discrepancies in "
+                              f"versions, I have not included many of the game specific data.\n Here "
+                              f"is a list of all available `pokedex` options",
+                              color=discord.Color.blue())
+        panel.add_field(name="Pokémon",
+                        value=f"Usage: `{await gcmds.prefix(ctx)}pokedex pokemon [name]`\n"
+                        f"Returns: Details about the specified Pokémon\n"
+                        f"Aliases: `-p`",
+                        inline=False)
+        panel.add_field(name="Move",
+                        value=f"Usage: `{await gcmds.prefix(ctx)}pokedex move [name]`\n"
+                        f"Returns: Details about the move\n"
+                        f"Aliases: `moves` `-m`",
+                        inline=False)
+        panel.add_field(name="Ability",
+                        value=f"Usage: `{await gcmds.prefix(ctx)}pokedex ability [name] [optional flag]`\n"
+                        f"Returns: Details about the specified ability\n"
+                        f"Flag: `-de` `-en` or blank *(defaults to english)*\n"
+                        f"Aliases: `-a`",
+                        inline=False)
+        panel.add_field(name="Item",
+                        value=f"Usage: `{await gcmds.prefix(ctx)} pokedex item [name]`\n"
+                        f"Returns: Details about the item"
+                        f"Aliases: `-i`",
+                        inline=False)
+        panel.add_field(name="Type",
+                        value=f"Usage: `{await gcmds.prefix(ctx)}pokedex type [name]`\n"
+                        f"Returns: Details about that type"
+                        f"Flag: `-p` `-m` or blank *(defaults to none)*"
+                        f"Aliases: `-t`",
+                        inline=False)
+        return await ctx.channel.send(embed=panel)
 
     @pokedex.command(aliases=['-p'])
     async def pokemon(self, ctx, *, pokemon_name: str):
@@ -283,7 +289,7 @@ class Pokedex(commands.Cog):
                                     description=f"{ctx.author.mention}, `{pokemon_name.capitalize()}` is not a valid "
                                                 f"Pokémon",
                                     color=discord.Color.dark_red())
-            return await ctx.channel.send(embed=invalid, delete_after=5)
+            return await ctx.channel.send(embed=invalid)
 
     @pokedex.command(aliases=['-m', 'moves'])
     async def move(self, ctx, *, move_name: str):
@@ -300,7 +306,7 @@ class Pokedex(commands.Cog):
             invalid = discord.Embed(title="Invalid Move Name",
                                     description=f"{ctx.author.mention}, `{move_name}` is not a valid move",
                                     color=discord.Color.dark_red())
-            return await ctx.channel.send(embed=invalid, delete_after=5)
+            return await ctx.channel.send(embed=invalid)
 
     @pokedex.command(aliases=['-a'])
     async def ability(self, ctx, *, ability_name_with_flag: str):
@@ -337,7 +343,7 @@ class Pokedex(commands.Cog):
                 invalid = discord.Embed(title="Invalid Ability Name",
                                         description=f"{ctx.author.mention}, `{ability_name}` is not a valid ability",
                                         color=discord.Color.dark_red())
-            return await ctx.channel.send(embed=invalid, delete_after=5)
+            return await ctx.channel.send(embed=invalid)
 
     @pokedex.command(aliases=['-i'])
     async def item(self, ctx, *, item_name: str):
@@ -354,7 +360,7 @@ class Pokedex(commands.Cog):
             invalid = discord.Embed(title="Invalid Item Name",
                                     description=f"{ctx.author.mention}, `{item_name}` is not a valid item",
                                     color=discord.Color.dark_red())
-            return await ctx.channel.send(embed=invalid, delete_after=5)
+            return await ctx.channel.send(embed=invalid)
 
     @pokedex.command(aliases=['-t'])
     async def type(self, ctx, *, type_name_flag: str):
@@ -386,8 +392,8 @@ class Pokedex(commands.Cog):
             invalid = discord.Embed(title="Invalid Type Name",
                                     description=f"{ctx.author.mention}, `{type_name}` is not a valid type",
                                     color=discord.Color.dark_red())
-            return await ctx.channel.send(embed=invalid, delete_after=5)
+            return await ctx.channel.send(embed=invalid)
 
 
-def setup(client):
-    client.add_cog(Pokedex(client))
+def setup(bot):
+    bot.add_cog(Pokedex(bot))

@@ -1,8 +1,13 @@
-discord.py[voice]==1.4.1
+discord.py[voice]==1.5.0
 numpy==1.19.1
 num2words==0.5.10
+praw~=7.1.0
 aiohttp~=3.6.2
 lavalink~=3.1.2
 python-dotenv~=0.14.0
-dateparser~=0.7.6
 pokepy~=0.6.1
+mcstatus~=4.0.0
+dateparser~=0.7.6
+asyncpg==0.21.0
+sympy~=1.6.2
+faker==4.4.0

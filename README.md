@@ -8,7 +8,7 @@ The bot's global prefixes are `?` and `@mention` , however, this may change at t
 
 ## Features ![documentationbadge](https://img.shields.io/badge/Documentation-100%25-bright_green)
 
-The bot has some really neat features. A complete list of them can be found [here](/cogs/README.md)
+The bot has some really neat features. Invite the bot and do `?help` to see all the commands and their usages.
 
 ## Security Concerns and Privacy
 
