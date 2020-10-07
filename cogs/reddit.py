@@ -3,7 +3,6 @@ from datetime import datetime
 
 import discord
 import praw
-import yaml
 from discord.ext import commands
 from utils import globalcommands
 
