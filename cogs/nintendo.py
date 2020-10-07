@@ -25,8 +25,8 @@ class Nintendo(commands.Cog):
 
     async def send_nintendo_help(self, ctx):
         pfx = f"{await gcmds.prefix(ctx)}nintendo"
-        description = (f"MarwynnBot's various Nintendo features allows users to register their Nintendo Switch friend "
-                       "code. Connect with other people and make some new friends! MarwynnBot respects your privacy and "
+        description = (f"UconnSmashBot's various Nintendo features allows users to register their Nintendo Switch friend "
+                       "code. Connect with other people and make some new friends! UconnSmashBot respects your privacy and "
                        "will allow you to register and unregister your information at any time")
         register = (f"**Usage:** `{pfx} register [friend_code]`",
                     "**Returns:** An embed that confirms you have successfully registered your information",

@@ -375,7 +375,7 @@ class Music(commands.Cog):
                               color=discord.Color.blue())
         return await ctx.channel.send(embed=embed)
 
-    @commands.command(desc="Makes MarwynnBot join the same voice channel you're in",
+    @commands.command(desc="Makes UconnSmashBot join the same voice channel you're in",
                       usage="join",
                       note="You may only use this when you are connected to a voice channel")
     async def join(self, ctx):
@@ -421,7 +421,7 @@ class Music(commands.Cog):
             await ctx.channel.send(embed=joinError)
             return
 
-    @commands.command(desc="Makes MarwynnBot play a song or the current queue",
+    @commands.command(desc="Makes UconnSmashBot play a song or the current queue",
                       usage="play (query)",
                       note="If there are songs in queue, `(query)` can be unspecified to start playing "
                       "the first song in the queue")
@@ -678,7 +678,7 @@ class Music(commands.Cog):
                                 color=discord.Color.blue())
         return await ctx.channel.send(embed=stopped)
 
-    @commands.command(desc="Makes MarwynnBot leave the voice channel it is currently in",
+    @commands.command(desc="Makes UconnSmashBot leave the voice channel it is currently in",
                       usage="leave")
     async def leave(self, ctx):
         player = self.bot.lavalink.player_manager.get(ctx.guild.id)

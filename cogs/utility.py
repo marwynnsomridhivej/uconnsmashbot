@@ -137,11 +137,11 @@ class Utility(commands.Cog):
                                   color=discord.Color.blue())
             return await ctx.channel.send(embed=embed)
 
-    @commands.command(desc="Displays MarwynnBot's invite link",
+    @commands.command(desc="Displays UconnSmashBot's invite link",
                       usage="invite")
     async def invite(self, ctx):
-        embed = discord.Embed(title="MarwynnBot's Invite Link",
-                              description=f"{ctx.author.mention}, thank you for using MarwynnBot! Here is MarwynnBot's"
+        embed = discord.Embed(title="UconnSmashBot's Invite Link",
+                              description=f"{ctx.author.mention}, thank you for using UconnSmashBot! Here is UconnSmashBot's"
                               f" invite link that you can share:\n\n {invite_url}",
                               color=discord.Color.blue(),
                               url=invite_url)
@@ -375,13 +375,13 @@ class Utility(commands.Cog):
                             color=color)
         await ctx.channel.send(embed=gmt)
 
-    @commands.command(desc="Displays MarwynnBot's uptime since the last restart",
+    @commands.command(desc="Displays UconnSmashBot's uptime since the last restart",
                       usage="uptime")
     async def uptime(self, ctx):
         time_now = int(datetime.now().timestamp())
         td = timedelta(seconds=time_now - self.bot.uptime)
         embed = discord.Embed(title="Uptime",
-                              description=f"MarwynnBot has been up and running for\n```\n{str(td)}\n```",
+                              description=f"UconnSmashBot has been up and running for\n```\n{str(td)}\n```",
                               color=discord.Color.blue())
         return await ctx.channel.send(embed=embed)
 

@@ -71,7 +71,7 @@ class Games(commands.Cog):
             await ctx.channel.send(embed=balanceEmbed)
 
     @commands.command(aliases=['gamestats', 'gs'],
-                      desc="Check your stats for MarwynnBot's games",
+                      desc="Check your stats for UconnSmashBot's games",
                       usage="gamestats (member)*va (game_name)")
     async def gameStats(self, ctx, member: typing.Optional[discord.Member] = None, game: str = None):
         if not member:

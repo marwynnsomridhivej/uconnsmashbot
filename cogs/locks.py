@@ -22,18 +22,18 @@ class Locks(commands.Cog):
 
     async def locks_help(self, ctx):
         pfx = f"{await gcmds.prefix(ctx)}lock"
-        description = (f"{ctx.author.mention}, the base command is `{pfx}` *alias=`lk`*. Locks are designed to prevent MarwynnBot from "
-                       "executing commands in channels where you don't want MarwynnBot commands to be run. This can be "
+        description = (f"{ctx.author.mention}, the base command is `{pfx}` *alias=`lk`*. Locks are designed to prevent UconnSmashBot from "
+                       "executing commands in channels where you don't want UconnSmashBot commands to be run. This can be "
                        "useful if you are having trouble specifying permissions in your server/channel settings, or "
-                       "if you have a designated bots channel where you want users to be able to invoke MarwynnBot from. "
-                       "With MarwynnBot, you can lock specific channels or lock every channel but specific channels. "
+                       "if you have a designated bots channel where you want users to be able to invoke UconnSmashBot from. "
+                       "With UconnSmashBot, you can lock specific channels or lock every channel but specific channels. "
                        "\n\nHere are all the subcommands")
         lset = (f"**Usage:** `{pfx} set [#channel]*va`",
                 "**Returns:** A confirmation panel that will let the user confirm they would like to lock the specified channels",
                 "**Alaises:** `-s`, `apply` `create`",
                 "**Special Cases:** [#channel] must be channel tags. Multiple channels can be specified by separating the tags "
-                "by commas. After confirmation, MarwynnBot will no longer respond to any commands invoked in those channels",
-                "**Note:** *if `[#channel]` is \"all\", MarwynnBot will lock all channels except for the current channel*")
+                "by commas. After confirmation, UconnSmashBot will no longer respond to any commands invoked in those channels",
+                "**Note:** *if `[#channel]` is \"all\", UconnSmashBot will lock all channels except for the current channel*")
         llist = (f"**Usage:** `{pfx} list (flag)`",
                  "**Returns:** A list of all channels that are locked or explicitly unlocked",
                  "**Aliases:** `-ls` `show`",
@@ -42,7 +42,7 @@ class Locks(commands.Cog):
                    "**Returns:** A confirmation panel that will let the user confirm they would like to unlock the specified channels",
                    "**Aliases:** `ulk` `-rm` `remove` `delete` `cancel`",
                    "**Special Cases:** [#channel] must be channel tags. Multiple channels can be specified by separating the tags "
-                   "by commas, or \"all\" to unlock all locked channels. After confirmation, MarwynnBot will once again"
+                   "by commas, or \"all\" to unlock all locked channels. After confirmation, UconnSmashBot will once again"
                    " respond to any commands invoked in those channels",
                    f"**Note:** *this command can also be invoked with `{await gcmds.prefix(ctx)}unlock [#channel]\*va`*")
         nv = [("Set", lset), ("List", llist), ("Unlock", lunlock)]

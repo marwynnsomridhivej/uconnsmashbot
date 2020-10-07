@@ -53,7 +53,7 @@ class GlobalCMDS:
 
     def __init__(self, bot: commands.AutoShardedBot = None):
         global _bot, _db
-        self.version = "v0.7.0-alpha.1"
+        self.version = "v2.0.0"
         self.bot = bot
         if bot:
             self.db = self.bot.db
@@ -147,7 +147,7 @@ class GlobalCMDS:
     async def github_request(self, method, url, *, params=None, data=None, headers=None):
         hdrs = {
             'Accept': 'application/vnd.github.inertia-preview+json',
-            'User-Agent': 'MarwynnBot Discord Token Invalidator',
+            'User-Agent': 'UconnSmashBot Discord Token Invalidator',
             'Authorization': f"token {self.env_check('GITHUB_TOKEN')}"
         }
 

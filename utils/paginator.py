@@ -42,16 +42,16 @@ class EmbedPaginator:
             self.permissions = self.channel.permissions_for(ctx.bot.user)
 
         if not self.permissions.embed_links:
-            raise customerrors.CannotPaginate("MarwynnBot missing embed links permission")
+            raise customerrors.CannotPaginate("UconnSmashBot missing embed links permission")
 
         if not self.permissions.send_messages:
-            raise customerrors.CannotPaginate("MarwynnBot cannot send messages")
+            raise customerrors.CannotPaginate("UconnSmashBot cannot send messages")
 
         if self.paginating:
             if not self.permissions.add_reactions:
-                raise customerrors.CannotPaginate("MarwynnBot missing add reactions permission")
+                raise customerrors.CannotPaginate("UconnSmashBot missing add reactions permission")
             if not self.permissions.read_message_history:
-                raise customerrors.CannotPaginate("MarwynnBot missing read message history permission")
+                raise customerrors.CannotPaginate("UconnSmashBot missing read message history permission")
 
     def get_page(self, page):
         base = (page - 1) * self.per_page

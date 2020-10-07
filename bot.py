@@ -32,7 +32,7 @@ ALL_CUSTOMERRORS = [
     customerrors.CommandNotFound,
 ]
 token_rx = re.compile(r'[MN][A-Za-z\d]{23}\.[\w-]{6}\.[\w-]{27}')
-version = f"Running MarwynnBot {gcmds.version}"
+version = f"Running USB {gcmds.version}"
 
 if os.path.exists('discord.log'):
     os.remove('discord.log')
@@ -149,13 +149,11 @@ class Bot(commands.AutoShardedBot):
     async def status(self):
         await self.wait_until_ready()
         at = await self.get_aliases()
-        activity1 = discord.Activity(name="m!h for help!", type=discord.ActivityType.listening)
-        activity2 = discord.Activity(name=f"{len(self.users)} users!", type=discord.ActivityType.watching)
-        activity3 = discord.Activity(name=f"{len(self.guilds)} servers!", type=discord.ActivityType.watching)
-        activity4 = discord.Activity(name=f"MarwynnBot {gcmds.version}", type=discord.ActivityType.playing)
-        activity5 = discord.Activity(name=f"{len(self.commands)} commands & {at} aliases",
+        activity1 = discord.Activity(name="? for help!", type=discord.ActivityType.listening)
+        activity2 = discord.Activity(name=f"USB {gcmds.version}", type=discord.ActivityType.playing)
+        activity3 = discord.Activity(name=f"{len(self.commands)} commands & {at} aliases",
                                      type=discord.ActivityType.listening)
-        activityList = [activity1, activity2, activity3, activity4, activity5]
+        activityList = [activity1, activity2, activity3]
         activity = random.choice(activityList)
         await self.change_presence(status=discord.Status.online, activity=activity)
 

@@ -138,7 +138,7 @@ class Actions(commands.Cog):
 
     @commands.group(invoke_without_command=True,
                     aliases=['action'],
-                    desc="Displays the help command for all actions MarwynnBot supports",
+                    desc="Displays the help command for all actions UconnSmashBot supports",
                     usage="actions (action_name)")
     async def actions(self, ctx, cmdName=None):
         cmd_names = [command.name for command in self.get_commands() if command.name != "actions"]

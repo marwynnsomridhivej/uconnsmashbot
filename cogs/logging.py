@@ -229,16 +229,16 @@ class Logging(commands.Cog):
         description = (f"{ctx.author.mention}, the base command is `{pfx}` *aliases=`lg` `log`*. Logging is a powerful "
                        "tool that will allow you to track multiple things at a time:\n",
                        "**1. Command Execution**",
-                       "> With logging level `basic`, MarwynnBot can send a message in the specified logging channel "
+                       "> With logging level `basic`, UconnSmashBot can send a message in the specified logging channel "
                        "whenever a server member uses a command. Logging messages may vary depending on what command "
                        "was used. *For example, logging moderation commands may display the results of the moderation "
                        "action, or logging actions commands may display what action was done to which member*\n",
                        "**2. Server Modification Events**",
-                       "> With logging level `server`, MarwynnBot will be able to do anything in logging level `basic`, "
+                       "> With logging level `server`, UconnSmashBot will be able to do anything in logging level `basic`, "
                        "but with the ability to log changes that happen to the server, such as moving voice regions, "
                        "renaming channels, changing channel permissions, anything that happens in audit log, etc\n",
                        "**3. Member Modification Events**",
-                       "> With logging level 'hidef`, MarwynnBot will be able to do anything in loggin g level `server`, "
+                       "> With logging level 'hidef`, UconnSmashBot will be able to do anything in loggin g level `server`, "
                        "but with the ability to log changes that happen to members in your server. This includes things "
                        "like status changes, nickname updates, username changes, etc. This can fall under a breach of "
                        "privacy, so this logging will only be reserved for those that have been pre-approved to access "
@@ -264,7 +264,7 @@ class Logging(commands.Cog):
         llevel = (f"**Usage:** `{pfx} level [level]`",
                   "**Returns:** An embed that confirms the server's log level was changed",
                   "**Aliases:** `lvl` `levels`",
-                  "**Special Cases:** This command can only be used if your server is a MarwynnBot Premium Server. "
+                  "**Special Cases:** This command can only be used if your server is a UconnSmashBot Premium Server. "
                   "`[level]` must be either \"basic\", \"server\", or \"hidef\"")
         lblacklist = (f"**Usage:** `{pfx} blacklist (guild)`",
                       "**Returns:** An embed that confirms the blacklist has been set for `(guild)`",

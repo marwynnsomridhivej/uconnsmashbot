@@ -60,7 +60,7 @@ class Tags(commands.Cog):
 
         embed = discord.Embed(title="Tag Commands",
                               description=f"{ctx.author.mention}, tags are an easy way to create your own custom "
-                              "command! Here are all the tag commands MarwynnBot supports",
+                              "command! Here are all the tag commands UconnSmashBot supports",
                               color=discord.Color.blue())
         embed.set_footer(text=timestamp, icon_url=ctx.author.avatar_url)
         for name, value in cmds:

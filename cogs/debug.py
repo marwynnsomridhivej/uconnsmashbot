@@ -33,12 +33,12 @@ class Debug(commands.Cog):
         except (discord.NotFound, discord.HTTPError, discord.Forbidden):
             return await ctx.author.send(embed=embed)
 
-    @commands.command(desc="Displays MarwynnBot's ping in milliseconds (ms)",
+    @commands.command(desc="Displays UconnSmashBot's ping in milliseconds (ms)",
                       usage="ping")
     async def ping(self, ctx):
         ping = discord.Embed(title='Ping', color=discord.Color.blue())
         ping.set_thumbnail(url='https://cdn1.iconfinder.com/data/icons/travel-and-leisure-vol-1/512/16-512.png')
-        ping.add_field(name="MarwynnBot", value=f'{round(self.bot.latency * 1000)}ms')
+        ping.add_field(name="UconnSmashBot", value=f'{round(self.bot.latency * 1000)}ms')
         await ctx.send(embed=ping)
 
     @commands.group(invoke_without_command=True,
@@ -211,7 +211,7 @@ class Debug(commands.Cog):
                 await gcmds.smart_delete(panel)
                 return await self.cancel(ctx, preview)
 
-    @commands.command(desc="Displays what MarwynnBot shard is connected to your server",
+    @commands.command(desc="Displays what UconnSmashBot shard is connected to your server",
                       usage="shard (flag)",
                       note="If `(flag)` is \"count\", it will display the total number of shards")
     async def shard(self, ctx, option=None):

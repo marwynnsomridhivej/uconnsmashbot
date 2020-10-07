@@ -149,13 +149,13 @@ class Starboard(commands.Cog):
 
     async def starboard_help(self, ctx) -> discord.Message:
         pfx = f"{await gcmds.prefix(ctx)}starboard"
-        description = (f"{ctx.author.mention}, the base command is `{pfx}` *alias=`sb`*. The starboard is a functino of MarwynnBot "
+        description = (f"{ctx.author.mention}, the base command is `{pfx}` *alias=`sb`*. The starboard is a functino of UconnSmashBot "
                        "that will allow you to create a \"gallery\" of funny messages just by reacting to it with a "
                        "specified starboard reaction. Here are all the subcommands")
         schannel = (f"**Usage:** `{pfx} channel [#channel]`",
                     "**Returns:** An embed that confirms your starboard channel was successfully bound",
                     "**Aliases:** `cn`",
-                    "**Special Cases:** If this command has not been called or a channel has not been specified, MarwynnBot "
+                    "**Special Cases:** If this command has not been called or a channel has not been specified, UconnSmashBot "
                     "will automatically create a new channel called \"starboard\" if such a channel doesn't already exist")
         sset = (f"**Usage:** `{pfx} set [emoji]`",
                 "**Returns:** An embed that confirms your emoji binding was successful",

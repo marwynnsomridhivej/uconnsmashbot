@@ -495,7 +495,7 @@ class Welcome(commands.Cog):
 
         await asyncio.sleep(5)
 
-        description = "Please tag or enter the ID of the channel you would like MarwynnBot to send the welcomer" \
+        description = "Please tag or enter the ID of the channel you would like UconnSmashBot to send the welcomer" \
             f" message, {or_default}\n\nCurrent Channel: <#{info[0]}>"
 
         # Get channel ID from user
@@ -527,7 +527,7 @@ class Welcome(commands.Cog):
         await gcmds.smart_delete(result)
 
         description = f"{ctx.author.mention}, please enter the title of the welcomer you would like " \
-            f"MarwynnBot to display, {or_default}\n\nCurrent Title: {info[1]}"
+            f"UconnSmashBot to display, {or_default}\n\nCurrent Title: {info[1]}"
 
         # Get title from user
         try:
@@ -573,7 +573,7 @@ class Welcome(commands.Cog):
             "`{member_count_ord}` ⟶ The ordinal number of members in this server ⟶ " \
             f"{num2words((len(ctx.guild.members) - bot_count), to='ordinal_num')}"
 
-        description = "Please enter the description of the welcomer message you would like MarwynnBot to" \
+        description = "Please enter the description of the welcomer message you would like UconnSmashBot to" \
             f" display, {or_default}\n\nCurrent Description: {info[2]}\n\n{desc_variables}"
 
         # Get desription from user

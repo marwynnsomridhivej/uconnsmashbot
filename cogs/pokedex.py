@@ -235,7 +235,7 @@ class Pokedex(commands.Cog):
                     usage="pokedex")
     async def pokedex(self, ctx):
         panel = discord.Embed(title="Pokedex Commands",
-                              description=f"Access MarwynnBot's Pokédex using `{await gcmds.prefix(ctx)}pokedex "
+                              description=f"Access UconnSmashBot's Pokédex using `{await gcmds.prefix(ctx)}pokedex "
                               f"[option]`. Please note that in order to avoid discrepancies in "
                               f"versions, I have not included many of the game specific data.\n Here "
                               f"is a list of all available `pokedex` options",

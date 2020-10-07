@@ -76,7 +76,7 @@ class NoPostgreSQL(PostgreSQLError):
 class NoBoundChannel(PostgreSQLError):
     def __init__(self):
         self.embed = discord.Embed(title="No Music Channel Bound",
-                                   description="You must bind MarwynnBot's music commands to a channel",
+                                   description="You must bind UconnSmashBot's music commands to a channel",
                                    color=discord.Color.dark_red())
 
 
@@ -119,7 +119,7 @@ class LockException(PostgreSQLError):
 class LockAllExcept(LockException):
     def __init__(self):
         super().__init__()
-        self.embed.description = "You cannot lock all channels, otherwise, MarwynnBot won't be able to respond to any commands!"
+        self.embed.description = "You cannot lock all channels, otherwise, UconnSmashBot won't be able to respond to any commands!"
 
 
 class NoLocksExist(LockException):
@@ -140,7 +140,7 @@ class ServerLinkChannelLimitExceeded(ServerLinkException):
         super().__init__()
         self.embed.title = "ServerLink Channel Limit Reached"
         self.embed.description = (f"{guild.name} can only register one ServerLink channel. To remove this restriction, "
-                                  "upgrade to a MarwynnBot Premium Server subscription")
+                                  "upgrade to a UconnSmashBot Premium Server subscription")
 
 
 class ServerLinkNoRegisteredChannels(ServerLinkException):
@@ -334,7 +334,7 @@ class InvalidTagName(TagError):
 class TagLimitReached(TagError):
     def __init__(self, user: discord.User):
         self.embed = discord.Embed(title="Tag Limit Reached",
-                                   description=f"{user.mention}, you must be a MarwynnBot Premium subscriber in order to "
+                                   description=f"{user.mention}, you must be a UconnSmashBot Premium subscriber in order to "
                                    "create more than 100 tags",
                                    color=discord.Color.dark_red())
 
@@ -355,63 +355,63 @@ class PremiumError(commands.CommandError):
 
 
 class NoPremiumGuilds(PremiumError):
-    """Error raised when there are no guilds that are MarwynnBot Premium guilds
+    """Error raised when there are no guilds that are UconnSmashBot Premium guilds
     """
 
     def __init__(self):
-        self.embed = discord.Embed(title="No MarwynnBot Premium Members",
-                                   description="There are no servers registered as MarwynnBot Premium servers \:(",
+        self.embed = discord.Embed(title="No UconnSmashBot Premium Members",
+                                   description="There are no servers registered as UconnSmashBot Premium servers \:(",
                                    color=discord.Color.dark_red())
 
 
 class NoPremiumUsers(PremiumError):
-    """Error raised when the current guild contains no MarwynnBot Premium users
+    """Error raised when the current guild contains no UconnSmashBot Premium users
     """
 
     def __init__(self):
-        self.embed = discord.Embed(title="No MarwynnBot Premium Members",
-                                   description="This server does not have any MarwynnBot Premium members \:(",
+        self.embed = discord.Embed(title="No UconnSmashBot Premium Members",
+                                   description="This server does not have any UconnSmashBot Premium members \:(",
                                    color=discord.Color.dark_red())
 
 
 class NoGlobalPremiumUsers(NoPremiumUsers):
-    """Error raised when no user is MarwynnBot Premium
+    """Error raised when no user is UconnSmashBot Premium
     """
 
     def __init__(self):
         super().__init__()
-        self.embed.description = "There are currently MarwynnBot Premium users"
+        self.embed.description = "There are currently UconnSmashBot Premium users"
 
 
 class NotPremiumGuild(PremiumError):
-    """Error raised when the current guild is not a MarwynnBot Premium guild
+    """Error raised when the current guild is not a UconnSmashBot Premium guild
 
     Args:
         guild (discord.Guild): the current guild
     """
 
     def __init__(self, guild: discord.Guild):
-        self.embed = discord.Embed(title="Not MarwynnBot Premium",
-                                   description=f"This guild, {guild.name}, must have a MarwynnBot Premium Server Subscription"
+        self.embed = discord.Embed(title="Not UconnSmashBot Premium",
+                                   description=f"This guild, {guild.name}, must have a UconnSmashBot Premium Server Subscription"
                                    " to use this command",
                                    color=discord.Color.dark_red())
 
 
 class NotPremiumUser(PremiumError):
-    """Error raised when the current user is not a MarwynnBot Premium user
+    """Error raised when the current user is not a UconnSmashBot Premium user
 
     Args:
         user (discord.User): the current user
     """
 
     def __init__(self, user: discord.User):
-        self.embed = discord.Embed(title="Not MarwynnBot Premium",
-                                   description=f"{user.mention}, you must have a MarwynnBot Premium User Subscription to use this command",
+        self.embed = discord.Embed(title="Not UconnSmashBot Premium",
+                                   description=f"{user.mention}, you must have a UconnSmashBot Premium User Subscription to use this command",
                                    color=discord.Color.dark_red())
 
 
 class NotPremiumUserOrGuild(PremiumError):
-    """Error raised when the current user and guild are both not MarwynnBot Premium
+    """Error raised when the current user and guild are both not UconnSmashBot Premium
 
     Args:
         user (discord.User): the current user
@@ -419,9 +419,9 @@ class NotPremiumUserOrGuild(PremiumError):
     """
 
     def __init__(self, user: discord.User, guild: discord.Guild):
-        self.embed = discord.Embed(title="Not MarwynnBot Premium",
+        self.embed = discord.Embed(title="Not UconnSmashBot Premium",
                                    description=f"{user.mention}, you or this server, {guild.name}, must have a "
-                                   "MarwynnBot Premium Server Subscription to use this command",
+                                   "UconnSmashBot Premium Server Subscription to use this command",
                                    color=discord.Color.dark_red())
 
 
@@ -439,7 +439,7 @@ class UserPremiumException(PremiumError):
 
 
 class UserAlreadyPremium(UserPremiumException):
-    """Error raised when the user already has MarwynnBot Premium
+    """Error raised when the user already has UconnSmashBot Premium
 
     Args:
         user (discord.User): the user the error occured with
@@ -447,7 +447,7 @@ class UserAlreadyPremium(UserPremiumException):
 
     def __init__(self, user: discord.User):
         super().__init__(user)
-        self.embed.description = f"{user.display_name} already has a MarwynnBot Premium subscription"
+        self.embed.description = f"{user.display_name} already has a UconnSmashBot Premium subscription"
 
 
 class GuildPremiumException(PremiumError):
@@ -464,7 +464,7 @@ class GuildPremiumException(PremiumError):
 
 
 class GuildAlreadyPremium(GuildPremiumException):
-    """Error raised when the guild already has MarwynnBot Premium
+    """Error raised when the guild already has UconnSmashBot Premium
 
     Args:
         guild (discord.Guild): the guild the error occured with
@@ -472,7 +472,7 @@ class GuildAlreadyPremium(GuildPremiumException):
 
     def __init__(self, guild: discord.Guild):
         super().__init__(guild)
-        self.embed.description = f"{guild.name} already has a MarwynnBot Premium subscription"
+        self.embed.description = f"{guild.name} already has a UconnSmashBot Premium subscription"
 
 
 class GameStatsError(commands.CommandError):
@@ -485,7 +485,7 @@ class GameStatsError(commands.CommandError):
 class NoStatsAll(GameStatsError):
     def __init__(self, user: discord.User):
         super().__init__()
-        self.embed.description = f"{user.mention}, you do not have any stats for any of MarwynnBot's games. Start playing to see your stats update!"
+        self.embed.description = f"{user.mention}, you do not have any stats for any of UconnSmashBot's games. Start playing to see your stats update!"
 
 
 class NoStatsGame(GameStatsError):

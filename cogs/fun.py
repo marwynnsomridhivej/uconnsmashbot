@@ -48,7 +48,7 @@ class Fun(commands.Cog):
         return await ctx.channel.send(embed=embed)
 
     @commands.command(aliases=['dad', 'father'],
-                      desc="Makes MarwynnBot say a super funny dad joke",
+                      desc="Makes UconnSmashBot say a super funny dad joke",
                       usage="dadjoke",)
     async def dadjoke(self, ctx):
         async with aiohttp.ClientSession(headers={"Accept": "application/json"}) as session:
@@ -60,7 +60,7 @@ class Fun(commands.Cog):
         return await ctx.channel.send(embed=embed)
 
     @commands.command(aliases=['8ball', '8b'],
-                      desc="MarwynnBot predicts the future with a Magic 8 Ball!",
+                      desc="UconnSmashBot predicts the future with a Magic 8 Ball!",
                       usage="eightball [question]")
     async def eightball(self, ctx, *, question):
         with open('responses', 'r') as f:
@@ -72,7 +72,7 @@ class Fun(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=['affirm'],
-                      desc="MarwynnBot delivers some words of encouragement!",
+                      desc="UconnSmashBot delivers some words of encouragement!",
                       usage="encourage")
     async def encourage(self, ctx):
         async with aiohttp.ClientSession() as session:
@@ -83,7 +83,7 @@ class Fun(commands.Cog):
                               color=discord.Color.blue())
         return await ctx.channel.send(embed=embed)
 
-    @commands.command(desc="MarwynnBot chooses between some choices",
+    @commands.command(desc="UconnSmashBot chooses between some choices",
                       usage="choose [choices]",
                       note="`[choices]` must be separated by \" or \"")
     async def choose(self, ctx, *, choices: str):
@@ -249,7 +249,7 @@ class Fun(commands.Cog):
             await asyncio.sleep(SLEEP_TIME)
         return
 
-    @commands.command(desc="Make MarwynnBot say anything",
+    @commands.command(desc="Make UconnSmashBot say anything",
                       usage="say [message]")
     async def say(self, ctx, *, args):
         sayEmbed = discord.Embed(description=args,
@@ -266,7 +266,7 @@ class Fun(commands.Cog):
             await asyncio.sleep(SLEEP_TIME)
         return
 
-    @commands.command(desc="Make MarwynnBot say anything, but in text to speech",
+    @commands.command(desc="Make UconnSmashBot say anything, but in text to speech",
                       usage="tts [message]")
     async def tts(self, ctx, *, args):
         return await ctx.channel.send(content=args, tts=True)

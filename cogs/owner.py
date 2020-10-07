@@ -74,16 +74,16 @@ class Owner(commands.Cog):
             async with self.bot.db.acquire() as con:
                 if op == "set":
                     await con.execute(f"INSERT INTO premium(guild_id) VALUES ({guild.id})")
-                    embed = discord.Embed(title=f"{guild.name} is now a MarwynnBot Premium Server",
+                    embed = discord.Embed(title=f"{guild.name} is now a UconnSmashBot Premium Server",
                                           description=f"{guild.owner.mention}, {owner.mention} has granted {guild.name} a "
-                                          f"never expiring MarwynnBot Premium subscription. Thank you for being a supporter of MarwynnBot!",
+                                          f"never expiring UconnSmashBot Premium subscription. Thank you for being a supporter of UconnSmashBot!",
                                           color=discord.Color.blue())
-                    embed.set_footer(text=f"Although this version of MarwynnBot Premium will never expire, it can be "
+                    embed.set_footer(text=f"Although this version of UconnSmashBot Premium will never expire, it can be "
                                      f"revoked at any time at the discretion of {owner.name}")
                 elif op == "remove":
                     await con.execute(f"DELETE FROM premium WHERE guild_id = {guild.id}")
-                    embed = discord.Embed(title=f"{guild.name} is no longer a MarwynnBot Premium Server",
-                                          description=f"{guild.owner.mention}, the MarwynnBot Premium subscription for "
+                    embed = discord.Embed(title=f"{guild.name} is no longer a UconnSmashBot Premium Server",
+                                          description=f"{guild.owner.mention}, the UconnSmashBot Premium subscription for "
                                           f"{guild.name} has been revoked. Please contact {owner.mention} if you "
                                           "believe this was a mistake",
                                           color=discord.Color.dark_red())
@@ -452,12 +452,12 @@ class Owner(commands.Cog):
                     desc="Displays the premium message",
                     usage="premium")
     async def premium(self, ctx):
-        description = ("MarwynnBot Premium is an optional, subscription based plan that will grant the subscriber complete, unrestricted "
-                       "access to all of MarwynnBot's \"premium locked\" features, such as creating and saving playlists, receiving special monthly"
-                       "balance crates, public tags, unlimited number of tags, a special role in the MarwynnBot Support Server, and more!\n\n"
-                       "**MarwynnBot Premium is currently unavailable. This message will update when it becomes available, most likely after MarwynnBot's"
+        description = ("UconnSmashBot Premium is an optional, subscription based plan that will grant the subscriber complete, unrestricted "
+                       "access to all of UconnSmashBot's \"premium locked\" features, such as creating and saving playlists, receiving special monthly"
+                       "balance crates, public tags, unlimited number of tags, a special role in the UconnSmashBot Support Server, and more!\n\n"
+                       "**UconnSmashBot Premium is currently unavailable. This message will update when it becomes available, most likely after UconnSmashBot's"
                        "v1.0.0-rc.1 release**")
-        embed = discord.Embed(title="MarwynnBot Premium",
+        embed = discord.Embed(title="UconnSmashBot Premium",
                               description=description,
                               color=discord.Color.blue())
         return await ctx.channel.send(embed=embed)
@@ -471,9 +471,9 @@ class Owner(commands.Cog):
     @commands.is_owner()
     async def users(self, ctx, user: discord.User, pm: bool = False):
         op = "set" if pm else "remove"
-        title = f"{user} is now MarwynnBot Premium!" if pm else f"{user} is no longer MarwynnBot Premium"
-        description = (f"{ctx.author.mention} set {user.mention} to MarwynnBot Premium" if pm
-                       else f"{ctx.author.mention} removed {user.mention}'s MarwynnBot Premium")
+        title = f"{user} is now UconnSmashBot Premium!" if pm else f"{user} is no longer UconnSmashBot Premium"
+        description = (f"{ctx.author.mention} set {user.mention} to UconnSmashBot Premium" if pm
+                       else f"{ctx.author.mention} removed {user.mention}'s UconnSmashBot Premium")
         color = discord.Color.blue() if pm else discord.Color.dark_red()
         await self.op_user_premium(op, user)
         embed = discord.Embed(title=title, description=description, color=color)
@@ -483,9 +483,9 @@ class Owner(commands.Cog):
     @commands.is_owner()
     async def guilds(self, ctx, pm: bool = False):
         op = "set" if pm else "remove"
-        title = f"{ctx.guild.name} is now MarwynnBot Premium!" if pm else f"{ctx.guild.name} is no longer MarwynnBot Premium"
-        description = (f"{ctx.author.mention} set {ctx.guild.name} to MarwynnBot Premium" if pm
-                       else f"{ctx.author.mention} removed {ctx.guild.name}'s MarwynnBot Premium")
+        title = f"{ctx.guild.name} is now UconnSmashBot Premium!" if pm else f"{ctx.guild.name} is no longer UconnSmashBot Premium"
+        description = (f"{ctx.author.mention} set {ctx.guild.name} to UconnSmashBot Premium" if pm
+                       else f"{ctx.author.mention} removed {ctx.guild.name}'s UconnSmashBot Premium")
         color = discord.Color.blue() if pm else discord.Color.dark_red()
         await self.op_guild_premium(op, ctx.guild)
         embed = discord.Embed(title=title, description=description, color=color)
@@ -502,7 +502,7 @@ class Owner(commands.Cog):
         op = source if source == "guild" else "global"
         entries = [f"{user.mention} - {user.name}" for user in await self.get_premium_users(ctx.guild, op)]
         pag = paginator.EmbedPaginator(ctx, entries=entries, per_page=10, show_entry_count=True)
-        pag.embed.title = f"MarwynnBot Premium Users in {ctx.guild.name}" if op == "guild" else "MarwynnBot Premium Users"
+        pag.embed.title = f"UconnSmashBot Premium Users in {ctx.guild.name}" if op == "guild" else "UconnSmashBot Premium Users"
         return await pag.paginate()
 
     @list_premium.command(aliases=['guilds', '-g'])
@@ -510,7 +510,7 @@ class Owner(commands.Cog):
     async def guild(self, ctx):
         entries = [f"{guild.name}" for guild in await self.get_premium_guilds()]
         pag = paginator.EmbedPaginator(ctx, entries=entries, per_page=10, show_entry_count=True)
-        pag.embed.title = "MarwynnBot Premium Servers"
+        pag.embed.title = "UconnSmashBot Premium Servers"
         return await pag.paginate()
 
     @commands.command(aliases=['dm', 'privatemessage'],
@@ -518,7 +518,7 @@ class Owner(commands.Cog):
                       usage="privatemessage [user] [message]")
     @commands.is_owner()
     async def privateMessage(self, ctx, user: discord.User, *, message):
-        dmEmbed = discord.Embed(title="MarwynnBot",
+        dmEmbed = discord.Embed(title="UconnSmashBot",
                                 description=message,
                                 color=discord.Color.blue())
         await user.send(embed=dmEmbed)

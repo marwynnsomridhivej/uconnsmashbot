@@ -173,7 +173,7 @@ class Roles(commands.Cog):
                     f"**Returns:** Message that details status of the deletion",
                     f"**Aliases:** `-d` `-rm` `del`",
                     f"**Special Cases:** {message_id_message}. If the panel was manually deleted, "
-                    f"MarwynnBot will delete the panel's record from its database of reaction role panels")
+                    f"UconnSmashBot will delete the panel's record from its database of reaction role panels")
         rrur = ("**Hex Color Picker:** https://www.google.com/search?q=color+picker",)
         nv = [("Create", rrcreate), ("Edit", rredit), ("Delete", rrdelete), ("Useful Resources", rrur)]
         for name, value in nv:
@@ -543,7 +543,7 @@ class Roles(commands.Cog):
     @commands.has_permissions(manage_guild=True)
     async def create(self, ctx):
         panel_embed = discord.Embed(title="Reaction Role Setup Menu",
-                                    description=f"{ctx.author.mention}, welcome to MarwynnBot's reaction role setup "
+                                    description=f"{ctx.author.mention}, welcome to UconnSmashBot's reaction role setup "
                                                 f"menu. Just follow the prompts and you will have a working reaction "
                                                 f"roles panel!",
                                     color=discord.Color.blue())
@@ -773,7 +773,7 @@ class Roles(commands.Cog):
             return await ctx.channel.send(embed=not_author)
 
         panel_embed = discord.Embed(title="Reaction Role Setup Menu",
-                                    description=f"{ctx.author.mention}, welcome to MarwynnBot's reaction role setup "
+                                    description=f"{ctx.author.mention}, welcome to UconnSmashBot's reaction role setup "
                                                 f"menu. Just follow the prompts to edit your panel!",
                                     color=discord.Color.blue())
         panel_embed.set_footer(text="Type \"cancel\" to cancel at any time")

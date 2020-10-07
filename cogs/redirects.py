@@ -24,8 +24,8 @@ class Redirects(commands.Cog):
     async def get_redirect_help(self, ctx):
         rd = f"{await gcmds.prefix(ctx)}redirect"
         description = (f"{ctx.author.mention}, the base command for redirects is `{rd}`. This command is used to instruct "
-                       "MarwynnBot to redirect the output of a command to a specific channel. Redirects will only work "
-                       "for MarwynnBot since MarwynnBot cannot truly redirect other bots' outputs without causing some features "
+                       "UconnSmashBot to redirect the output of a command to a specific channel. Redirects will only work "
+                       "for UconnSmashBot since UconnSmashBot cannot truly redirect other bots' outputs without causing some features "
                        "to break.\n\nHere are the available subcommands for redirect")
         rset = (f"**Usage:** `{rd} set [#channel] [command]*va`",
                 "**Returns:** A confirmation embed that requires the user to confirm that they would like the output for "
@@ -48,7 +48,7 @@ class Redirects(commands.Cog):
                           "be assigned the type `all`, and when setting the redirect for specific commands or a list of commands, "
                           "it will be assigned the type `override`. Essentially this means that when you set the redirect "
                           "for a specific command, it will use that redirect, even if a global redirect was set. This is "
-                          "useful for when you want to redirect MarwynnBot's output for all commmands to a specific channel "
+                          "useful for when you want to redirect UconnSmashBot's output for all commmands to a specific channel "
                           "EXCEPT for a couple commands. This is achieved by assigning their redirects seperately as stated above. "
                           "Subcommand redirects are not supported, so the redirect will apply to all commands within the "
                           "command group if the base command is a group.")
