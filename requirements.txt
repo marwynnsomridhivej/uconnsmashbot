@@ -11,3 +11,4 @@ dateparser~=0.7.6
 asyncpg==0.21.0
 sympy~=1.6.2
 faker==4.4.0
+uvloop==0.14.0

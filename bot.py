@@ -15,6 +15,12 @@ from dotenv import load_dotenv
 from lavalink.exceptions import NodeException
 from utils import customerrors, globalcommands, context
 
+try:
+    import uvloop
+except ImportError:
+    pass
+else:
+    asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 gcmds = globalcommands.GlobalCMDS()
 DISABLED_COGS = ["Blackjack", 'Coinflip', 'Connectfour', 'Oldmaid', 'Slots', 'Uno',
