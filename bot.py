@@ -120,12 +120,6 @@ class Bot(commands.AutoShardedBot):
             names = "'{\"" + '", "'.join(command.name for command in self.commands) + "\"}'"
             await con.execute(f"INSERT INTO global_counters(command, amount) VALUES {values} ON CONFLICT DO NOTHING")
             await con.execute(f"DELETE FROM global_counters WHERE command != ALL({names}::text[])")
-            for guild in self.guilds:
-                op = [f'"{command.name}": 0' for command in self.commands]
-                op_string = "'{" + ", ".join(op) + "}'"
-                await con.execute(f"INSERT INTO guild (guild_id, custom_prefix, counter) VALUES ('{guild.id}', '?', {op_string})"
-                                  " ON CONFLICT DO NOTHING")
-                await con.execute(f"INSERT INTO logging(guild_id) VALUES ({guild.id}) ON CONFLICT DO NOTHING")
         return
 
     async def on_command_completion(self, ctx):
