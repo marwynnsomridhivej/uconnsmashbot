@@ -1,7 +1,6 @@
 import asyncio
 import math
 import os
-from datetime import datetime
 
 import aiohttp
 import discord
@@ -9,6 +8,13 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 from utils import customerrors
+
+
+__all__ = (
+    "GlobalCMDS",
+    "GithubError",
+)
+
 
 load_dotenv()
 env_write = ["TOKEN=YOUR_BOT_TOKEN",
@@ -27,7 +33,8 @@ env_write = ["TOKEN=YOUR_BOT_TOKEN",
              "REDDIT_CLIENT_SECRET=CLIENT_SECRET_FROM_REDDIT_API",
              "USER_AGENT=YOUR_USER_AGENT",
              "TENOR_API=API_KEY_FROM_TENOR",
-             "GITHUB_TOKEN=PERSONAL_ACCESS_TOKEN"]
+             "GITHUB_TOKEN=PERSONAL_ACCESS_TOKEN",
+             "NASA_API=DEMO_KEY"]
 default_env = ["YOUR_BOT_TOKEN",
                "YOUR_ID_HERE",
                "POSTGRES_USERNAME",
@@ -44,7 +51,8 @@ default_env = ["YOUR_BOT_TOKEN",
                "CLIENT_SECRET_FROM_REDDIT_API",
                "YOUR_USER_AGENT",
                "API_KEY_FROM_TENOR",
-               "PERSONAL_ACCESS_TOKEN"]
+               "PERSONAL_ACCESS_TOKEN",
+               "DEMO_KEY"]
 _bot = None
 _db = None
 
@@ -53,7 +61,7 @@ class GlobalCMDS:
 
     def __init__(self, bot: commands.AutoShardedBot = None):
         global _bot, _db
-        self.version = "v2.0.0"
+        self.version = "v3.0.0"
         self.bot = bot
         if bot:
             self.db = self.bot.db
@@ -72,10 +80,21 @@ class GlobalCMDS:
             return False
         return os.getenv(key)
 
+    @staticmethod
+    def get_color_from_hex(hex_color: str) -> discord.Color:
+        return int(hex_color[1:], 16)
+
     async def smart_delete(self, message: discord.Message):
         if message.guild and message.guild.me.guild_permissions.manage_messages:
             try:
                 await message.delete()
+            except Exception:
+                pass
+
+    async def smart_clear(self, message: discord.Message):
+        if message.guild and message.guild.me.guild_permissions.manage_messages:
+            try:
+                await message.clear_reactions()
             except Exception:
                 pass
 
@@ -92,26 +111,26 @@ class GlobalCMDS:
                               color=discord.Color.dark_red())
         return await ctx.channel.send(embed=embed)
 
-    async def cancelled(self, ctx: commands.Context, title: str) -> discord.Message:
-        embed = discord.Embed(title=f"{title.title()} Cancelled",
-                              description=f"{ctx.author.mention}, your {title} was cancelled",
+    async def canceled(self, ctx: commands.Context, title: str) -> discord.Message:
+        embed = discord.Embed(title=f"{title.title()} Canceled",
+                              description=f"{ctx.author.mention}, your {title} was canceled",
                               color=discord.Color.dark_red())
         return await ctx.channel.send(embed=embed)
 
     async def panel_deleted(self, ctx: commands.Context, title: str) -> discord.Message:
-        embed = discord.Embed(title=f"{title.title()} Cancelled",
-                              description=f"{ctx.author.mention}, your {title} was cancelled because the panel was "
+        embed = discord.Embed(title=f"{title.title()} Canceled",
+                              description=f"{ctx.author.mention}, your {title} was canceled because the panel was "
                               "deleted or could not be found",
                               color=discord.Color.dark_red())
         return await ctx.channel.send(embed=embed)
 
-    async def prefix(self, ctx):
-        if not ctx.guild:
+    async def prefix(self, ctx: commands.Context, guild_id: int = None):
+        if ctx and not ctx.guild:
             return "m!"
 
         async with self.db.acquire() as con:
-            prefix = await con.fetchval(f"SELECT custom_prefix FROM guild WHERE guild_id = {ctx.guild.id}")
-            return prefix
+            prefix = await con.fetchval(f"SELECT custom_prefix FROM guild WHERE guild_id = {ctx.guild.id if ctx else guild_id}")
+            return prefix or "m!"
 
     async def blacklist_db(self, execute):
         try:
@@ -123,31 +142,19 @@ class GlobalCMDS:
     async def balance_db(self, execute: str, ret_val: bool = False):
         async with self.db.acquire() as con:
             if ret_val:
-                val = await con.fetch(execute)
-                return val[0]['amount']
+                return await con.fetchval(execute)
             else:
                 await con.execute(execute)
 
     async def get_balance(self, member: discord.Member):
         async with self.db.acquire() as con:
             bal = await con.fetchval(f"SELECT amount FROM balance WHERE user_id = {member.id}")
-            return int(bal) if bal else None
-
-    async def ratio(self, user: discord.User, game: str):
-        async with self.db.acquire() as con:
-            result = (await con.fetch(f"SELECT win, lose FROM {game.lower()} WHERE user_id={user.id}"))[0]
-        if int(result['lose']) == 0:
-            op = f"UPDATE {game.lower()} SET ratio = 9999 WHERE user_id = {user.id}"
-        else:
-            op = f"UPDATE {game.lower()} SET ratio = {self.truncate((int(result['win']) / int(result['lose'])), 3)}"
-            f" WHERE user_id = {user.id}"
-        async with self.db.acquire() as con:
-            await con.execute(op)
+            return int(bal) if bal is not None else None
 
     async def github_request(self, method, url, *, params=None, data=None, headers=None):
         hdrs = {
             'Accept': 'application/vnd.github.inertia-preview+json',
-            'User-Agent': 'UconnSmashBot Discord Token Invalidator',
+            'User-Agent': 'MarwynnBot Discord Token Invalidator',
             'Authorization': f"token {self.env_check('GITHUB_TOKEN')}"
         }
 

@@ -1,27 +1,71 @@
 import asyncio
-import types
-from collections import namedtuple
+from collections.abc import Hashable
 from datetime import datetime
 from typing import Optional, Sequence, Union
 
 import discord
 from discord.ext import commands
-from utils import customerrors, globalcommands, premium, logdispatcher
+from utils import GlobalCMDS, SubcommandHelp, customerrors, logdispatcher
 from utils.enums import ConfirmReactions, LogLevel
+from utils.logdispatcher import (ChannelDiff, ChannelOverwriteDiff,
+                                 EmojiAttrDiff, GuildDiff, GuildRoleDiff,
+                                 MemberDiff, MemberRoleDiff, OverwriteDiff,
+                                 RolePermissionDiff)
 
-gcmds = globalcommands.GlobalCMDS()
-GuildDiff = namedtuple("GuildAttributeDiff", ['type', 'before', 'after'])
-ChannelDiff = namedtuple("ChannelAttributeDiff", ['type', 'before', 'after'])
-MemberDiff = namedtuple("MemberAttributeDiff", ['type', 'before', 'after'])
-MemberRoleDiff = namedtuple("MemberRoleDiff", ['type', 'role'])
-UserDiff = namedtuple("UserAttributeDiff", ['type', 'before', 'after'])
+_check = lambda __a, __o: not __a.startswith("_") and isinstance(
+    getattr(__o, __a), Hashable) and not callable(getattr(__o, __a))
+_PERM_ATTRS = frozenset(
+    attr for attr in vars(discord.Permissions) if _check(attr, discord.Permissions)
+)
+_ROLE_ATTRS = frozenset([
+    "color",
+    "hoist",
+    "mentionable",
+    "name",
+    "position",
+])
+_TEXTCHANNEL_ATTRS = frozenset([
+    "name",
+    "category",
+    "overwrites",
+    "permissions_synced",
+    "position",
+    "slowmode_delay",
+    "topic",
+])
+_VOICECHANNEL_ATTRS = frozenset([
+    "name",
+    "category",
+    "bitrate",
+    "user_limit",
+    "overwrites",
+    "permissions_synced",
+    "position",
+])
+_CATEGORYCHANNEL_ATTRS = frozenset([
+    "name",
+    "text_channels",
+    "voice_channels",
+    "overwrites",
+    "position",
+])
+_GUILD_ATTRS = frozenset([
+    attr for attr in discord.Guild.__slots__ if _check(attr, discord.Guild) and not attr in [
+        "members",
+        "self_role",
+        "shard_id",
+        "system_channel_flags",
+        "unavailable",
+        "voice_client",
+    ]
+])
+_diff = lambda _a, _p, _c: getattr(_p, _a) != getattr(_c, _a)
 
 
 class Logging(commands.Cog):
     def __init__(self, bot: commands.AutoShardedBot):
-        global gcmds
         self.bot = bot
-        gcmds = globalcommands.GlobalCMDS(self.bot)
+        self.gcmds = GlobalCMDS(self.bot)
         self.bot.loop.create_task(self.init_logging())
         self.guild_dispatch = logdispatcher.GuildDispatcher(self.bot)
         self.member_dispatch = logdispatcher.MemberDispatcher(self.bot)
@@ -33,14 +77,14 @@ class Logging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_update(self, before: discord.abc.GuildChannel, after: discord.abc.GuildChannel):
-        set_after = set([(attr, getattr(after, attr)) for attr in after.__slots__
-                         if not attr.startswith("_")
-                         and not type(getattr(after, attr)) == list])
-        set_before = set([(attr, getattr(before, attr)) for attr in before.__slots__
-                          if not attr.startswith("_")
-                          and not type(getattr(before, attr)) == list])
-        diff_list = [GuildDiff(attr, getattr(before, attr), value) for attr, value in set_after - set_before]
-        await self.guild_dispatch.guild_update(after, diff_list)
+        diff = [
+            GuildDiff(
+                type=attr,
+                before=getattr(before, attr),
+                after=getattr(after, attr),
+            ) for attr in _GUILD_ATTRS if _diff(attr, before, after)
+        ]
+        await self.guild_dispatch.guild_update(after, diff)
 
     @commands.Cog.listener()
     async def on_guild_channel_create(self, channel: discord.abc.GuildChannel):
@@ -52,14 +96,60 @@ class Logging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_channel_update(self, before: discord.abc.GuildChannel, after: discord.abc.GuildChannel):
-        set_after = set([(attr, getattr(after, attr)) for attr in after.__slots__
-                         if not attr.startswith("_")
-                         and not type(getattr(after, attr)) == list])
-        set_before = set([(attr, getattr(before, attr)) for attr in before.__slots__
-                          if not attr.startswith("_")
-                          and not type(getattr(before, attr)) == list])
-        diff_list = [ChannelDiff(attr, getattr(before, attr), value) for attr, value in set_after - set_before]
-        await self.guild_dispatch.guild_channel_attr_update(after, diff_list)
+        if isinstance(after, discord.TextChannel):
+            main_diff = [
+                ChannelDiff(attr, getattr(before, attr), getattr(after, attr)) for attr in _TEXTCHANNEL_ATTRS if _diff(attr, before, after)
+            ]
+            before_nsfw = before.is_nsfw()
+            after_nsfw = after.is_nsfw()
+            if before_nsfw != after_nsfw:
+                main_diff.append(
+                    ChannelDiff(
+                        type="NSFW Flag",
+                        before=before_nsfw,
+                        after=after_nsfw,
+                    )
+                )
+            channel_type = "text"
+        elif isinstance(after, discord.VoiceChannel):
+            main_diff = [
+                ChannelDiff(attr, getattr(before, attr), getattr(after, attr)) for attr in _VOICECHANNEL_ATTRS if _diff(attr, before, after)
+            ]
+            channel_type = "voice"
+        elif isinstance(after, discord.CategoryChannel):
+            main_diff = [
+                ChannelDiff(attr, getattr(before, attr), getattr(after, attr)) for attr in _CATEGORYCHANNEL_ATTRS if _diff(attr, before, after)
+            ]
+            channel_type = "cateogry"
+        else:
+            return
+
+        overwrite_diff = []
+        for _before, _after in zip(before.overwrites.items(), after.overwrites.items()):
+            _, before_overwrite = _before
+            target, after_overwrite = _after
+            diff = []
+            for before_state, after_state in zip(before_overwrite, after_overwrite):
+                _, before_value = before_state
+                perm, after_value = after_state
+                if before_value != after_value:
+                    diff.append(
+                        OverwriteDiff(
+                            perm=perm,
+                            before=before_value,
+                            after=after_value,
+                        )
+                    )
+            if diff:
+                overwrite_diff.append(
+                    ChannelOverwriteDiff(
+                        type="role" if isinstance(target, discord.Role) else "member",
+                        target=target,
+                        diffs=diff,
+                    )
+                )
+        if main_diff or overwrite_diff:
+            await self.guild_dispatch.guild_channel_attr_update(after, channel_type, main_diff, overwrite_diff)
 
     @commands.Cog.listener()
     async def on_guild_channel_pins_update(self, channel: discord.abc.GuildChannel, last_pin: Optional[datetime]):
@@ -75,20 +165,36 @@ class Logging(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_role_update(self, before: discord.Role, after: discord.Role):
-        set_after = set([(attr, getattr(after, attr)) for attr in after.__slots__
-                         if not attr.startswith("_")
-                         and not type(getattr(after, attr)) == list])
-        set_before = set([(attr, getattr(before, attr)) for attr in before.__slots__
-                          if not attr.startswith("_")
-                          and not type(getattr(before, attr)) == list])
-        diff_list = [ChannelDiff(attr, getattr(before, attr), value) for attr, value in set_after - set_before]
-        await self.guild_dispatch.guild_role_attr_update(after, diff_list)
+        main_diff = [
+            GuildRoleDiff(attr, getattr(before, attr), getattr(after, attr)) for attr in _ROLE_ATTRS if _diff(attr, before, after)
+        ]
+        perm_diff = [
+            RolePermissionDiff(attr, getattr(before.permissions, attr), getattr(after.permissions, attr)) for attr in _PERM_ATTRS if _diff(attr, before.permissions, after.permissions)
+        ]
+        main_diff.sort(key=lambda i: i.attr)
+        perm_diff.sort(key=lambda i: i.attr)
+        if main_diff or perm_diff:
+            await self.guild_dispatch.guild_role_attr_update(after, main_diff, perm_diff)
 
     @commands.Cog.listener()
     async def on_guild_emojis_update(self, guild: discord.Guild, before: Sequence[discord.Emoji], after: Sequence[discord.Emoji]):
-        event_type = "added" if len(before) < len(after) else "removed"
-        diff_list = set(after) ^ set(before)
-        await self.guild_dispatch.guild_emoji_update(guild, event_type, diff_list)
+        event_type = "added" if len(before) < len(after) else "removed" if len(before) > len(after) else "updated"
+        if event_type == "updated":
+            diff = [
+                EmojiAttrDiff(
+                    attr="name",
+                    emoji=after_state,
+                    before=before_state.name,
+                    after=after_state.name,
+                )
+                for before_state, after_state in zip(before, after)
+                if _diff("name", before_state, after_state)
+            ]
+            if not diff:
+                return
+        else:
+            diff = set(after) ^ set(before)
+        await self.guild_dispatch.guild_emoji_update(guild, event_type, diff)
 
     @commands.Cog.listener()
     async def on_guild_integrations_update(self, guild: discord.Guild):
@@ -165,7 +271,8 @@ class Logging(commands.Cog):
     async def on_raw_message_delete(self, payload: discord.RawMessageDeleteEvent):
         await self.guild_dispatch.message_raw_delete(
             payload.message_id,
-            payload.channel_id
+            payload.channel_id,
+            payload.cached_message
         )
 
     @commands.Cog.listener()
@@ -213,7 +320,7 @@ class Logging(commands.Cog):
     async def init_logging(self):
         await self.bot.wait_until_ready()
         async with self.bot.db.acquire() as con:
-            values = "(guild_id bigint PRIMARY KEY, \"" + \
+            values = "(guild_id bigint PRIMARY KEY, webhook_id bigint, \"" + \
                 '\" boolean DEFAULT FALSE, \"'.join(command.name.lower() for command in sorted(self.bot.commands,
                                                                                                key=lambda x: x.name)) + \
                 "\" boolean DEFAULT FALSE)"
@@ -225,67 +332,47 @@ class Logging(commands.Cog):
         return
 
     async def send_logging_help(self, ctx):
-        pfx = f"{await gcmds.prefix(ctx)}logging"
-        description = (f"{ctx.author.mention}, the base command is `{pfx}` *aliases=`lg` `log`*. Logging is a powerful "
-                       "tool that will allow you to track multiple things at a time:\n",
-                       "**1. Command Execution**",
-                       "> With logging level `basic`, UconnSmashBot can send a message in the specified logging channel "
-                       "whenever a server member uses a command. Logging messages may vary depending on what command "
-                       "was used. *For example, logging moderation commands may display the results of the moderation "
-                       "action, or logging actions commands may display what action was done to which member*\n",
-                       "**2. Server Modification Events**",
-                       "> With logging level `server`, UconnSmashBot will be able to do anything in logging level `basic`, "
-                       "but with the ability to log changes that happen to the server, such as moving voice regions, "
-                       "renaming channels, changing channel permissions, anything that happens in audit log, etc\n",
-                       "**3. Member Modification Events**",
-                       "> With logging level 'hidef`, UconnSmashBot will be able to do anything in loggin g level `server`, "
-                       "but with the ability to log changes that happen to members in your server. This includes things "
-                       "like status changes, nickname updates, username changes, etc. This can fall under a breach of "
-                       "privacy, so this logging will only be reserved for those that have been pre-approved to access "
-                       "this feature\n",
-                       "Here are all the subcommands")
-        lset = (f"**Usage:** `{pfx} set [#channel]`",
-                "**Returns:** An embed that confirms that you have successfully set the logging channel",
-                "**Aliases:** `-s` `use`",
-                "**Special Cases:** `[#channel]` should be a channel tag or channel ID")
-        lcommand = (f"**Usage:** `{pfx} command [command]`",
-                    "**Returns:** An embed that confirms you have successfully toggled logging status for that command",
-                    "**Aliases:** `toggle` `cmd`",
-                    "**Special Cases:** `[command]` must be a command name, not an alias *(`help` instead of `h`)*. Enter "
-                    "*\"all\"* to toggle all")
-        llist = (f"**Usage:** `{pfx} list (command)`",
-                 "**Returns:** An embed that displays the current logging channel and logging level, if set",
-                 "**Aliases:** `-ls` `show` `display`",
-                 "**Special Cases:** This will return an error message if no logging channel is set. If `(command)` is "
-                 "specified, it will display the logging status for that command if it is a valid command")
-        ldisable = (f"**Usage:** `{pfx} disable`",
-                    "**Returns:** A confirmation embed that once confirmed, will disable logging on this server",
-                    "**Aliases:** `-rm` `delete` `reset` `clear` `remove`")
-        llevel = (f"**Usage:** `{pfx} level [level]`",
-                  "**Returns:** An embed that confirms the server's log level was changed",
-                  "**Aliases:** `lvl` `levels`",
-                  "**Special Cases:** This command can only be used if your server is a UconnSmashBot Premium Server. "
-                  "`[level]` must be either \"basic\", \"server\", or \"hidef\"")
-        lblacklist = (f"**Usage:** `{pfx} blacklist (guild)`",
-                      "**Returns:** An embed that confirms the blacklist has been set for `(guild)`",
-                      "**Aliases:** `bl`",
-                      "**Special Cases:** This is an owner only command. `(guild)` will default to the current server "
-                      "if unspecified")
-        nv = [("Set", lset), ("List", llist), ("Remove", ldisable), ("Level", llevel), ("Blacklist", lblacklist)]
-        embed = discord.Embed(title="Logging Help", description="\n".join(description), color=discord.Color.blue())
-        for name, value in nv:
-            embed.add_field(name=name, value="> " + "\n> ".join(value), inline=False)
-        return await ctx.channel.send(embed=embed)
+        pfx = f"{await self.gcmds.prefix(ctx)}logging"
+        return await SubcommandHelp(
+            pfx=pfx,
+            title="Logging Help",
+            description="\n".join(
+                (
+                    f"{ctx.author.mention}, the base command is `{pfx}` *aliases=`lg` `log`*. Logging is a powerful "
+                    "tool that will allow you to track multiple things at a time:\n",
+                    "**1. Command Execution**",
+                    "> With logging level `basic`, UconnSmashBot can send a message in the specified logging channel "
+                    "whenever a server member uses a command. Logging messages may vary depending on what command "
+                    "was used. *For example, logging moderation commands may display the results of the moderation "
+                    "action, or logging actions commands may display what action was done to which member*\n",
+                    "**2. Server Modification Events**",
+                    "> With logging level `server`, UconnSmashBot will be able to do anything in logging level `basic`, "
+                    "but with the ability to log changes that happen to the server, such as moving voice regions, "
+                    "renaming channels, changing channel permissions, anything that happens in audit log, etc\n",
+                    "**3. Member Modification Events**",
+                    "> With logging level `hidef`, UconnSmashBot will be able to do anything in logging level `server`, "
+                    "but with the ability to log changes that happen to members in your server. This includes things "
+                    "like status changes, nickname updates, username changes, etc. This can fall under a breach of "
+                    "privacy, so this logging will only be reserved for those that have been pre-approved to access "
+                    "this feature\n",
+                    "Here are all the subcommands"
+                )
+            ),
+            per_page=2,
+        ).from_config("logging").show_help(ctx)
 
-    async def check_loggable(self, ctx):
+    async def check_loggable(self, ctx, channel: discord.TextChannel):
         async with self.bot.db.acquire() as con:
             on_blacklist = await con.fetch(f"SELECT * FROM guild WHERE guild_id={ctx.guild.id} AND log_channel=-1")
         if on_blacklist:
             raise customerrors.LoggingBlacklisted(ctx.guild)
+        perms = ctx.guild.me.permissions_in(channel)
+        if not perms.send_messages:
+            raise customerrors.CannotMessageChannel(channel)
 
     async def set_logging_channel(self, ctx, channel: discord.TextChannel) -> discord.Message:
         embed = discord.Embed()
-        await self.check_loggable(ctx)
+        await self.check_loggable(ctx, channel)
         try:
             async with self.bot.db.acquire() as con:
                 await con.execute(f"UPDATE guild SET log_channel={channel.id} WHERE guild_id={ctx.guild.id}")
@@ -348,8 +435,7 @@ class Logging(commands.Cog):
                                       description=f"{ctx.author.mention}, logging for all commands were ""{}"
                                       .format("enabled" if not update_bool else "disabled"),
                                       color=discord.Color.blue())
-        except Exception as e:
-            raise e
+        except Exception:
             embed = discord.Embed(title="Toggle Set Failed",
                                   description=f"{ctx.author.mention}, I could not toggle logging status for the command `{name}`",
                                   color=discord.Color.dark_red())
@@ -396,9 +482,9 @@ class Logging(commands.Cog):
         async with self.bot.db.acquire() as con:
             status = await con.fetchval(f"SELECT {name.lower()} FROM logging WHERE guild_id={ctx.guild.id}")
         embed = discord.Embed(title="Command Logging Details",
-                                description=f"Logging for the command `{name.lower()}` is ""**{}**"
-                                .format('enabled' if status else 'disabled'),
-                                color=discord.Color.blue())
+                              description=f"Logging for the command `{name.lower()}` is ""**{}**"
+                              .format('enabled' if status else 'disabled'),
+                              color=discord.Color.blue())
         return await ctx.channel.send(embed=embed)
 
     @logging.command(aliases=['rm', 'delete', 'reset', 'clear', 'remove', 'disable'])
@@ -423,25 +509,24 @@ class Logging(commands.Cog):
         try:
             result = await self.bot.wait_for("reaction_add", check=reacted, timeout=30)
         except asyncio.TimeoutError:
-            return await gcmds.timeout(ctx, "logging disable", 30)
-        await gcmds.smart_delete(panel)
+            return await self.gcmds.timeout(ctx, "logging disable", 30)
+        await self.gcmds.smart_delete(panel)
         if result[0].emoji == reactions[0]:
             return await self.remove_logging(ctx)
         else:
-            return await gcmds.cancelled(ctx, "logging disable")
+            return await self.gcmds.canceled(ctx, "logging disable")
 
     @logging.group(invoke_without_command=True, aliases=['lvl', 'level', 'levels'])
     @commands.has_permissions(manage_guild=True)
     async def logging_level(self, ctx, level):
         return
 
-    @logging_level.command(aliases=['0'])
+    @logging_level.command(aliases=['1'])
     @commands.has_permissions(manage_guild=True)
     async def basic(self, ctx):
         return await self.set_logging_level(ctx, 1)
 
-    @premium.is_premium(req_guild=True)
-    @logging_level.command(aliases=['server', '1'])
+    @logging_level.command(aliases=['server', '2'])
     @commands.has_permissions(manage_guild=True)
     async def guild(self, ctx):
         return await self.set_logging_level(ctx, 2)

@@ -18,4 +18,3 @@ pokepy~=0.6.1
 psutil==5.7.2
 python-dotenv~=0.14.0
 setuppanel==1.0.3
-uvloop==0.14.0

@@ -1,11 +1,12 @@
 import asyncio
-import discord
 import typing
-from discord.ext import commands
-import numpy as np
-from utils import globalcommands
 
-gcmds = globalcommands.GlobalCMDS()
+import discord
+import numpy as np
+from discord.ext import commands
+from utils import GlobalCMDS
+
+gcmds = GlobalCMDS()
 
 
 async def win(ctx, betAmount, bot):
@@ -17,7 +18,6 @@ async def win(ctx, betAmount, bot):
             await con.execute(f"INSERT INTO coinflip(user_id, win) VALUES ({ctx.author.id}, 1)")
         else:
             await con.execute(f"UPDATE coinflip SET win = win + 1 WHERE user_id = {ctx.author.id}")
-    await gcmds.ratio(ctx.author, 'coinflip')
     return
 
 
@@ -30,23 +30,23 @@ async def lose(ctx, betAmount, bot):
             await con.execute(f"INSERT INTO coinflip(user_id, lose) VALUES ({ctx.author.id}, 1)")
         else:
             await con.execute(f"UPDATE coinflip SET lose = lose + 1 WHERE user_id = {ctx.author.id}")
-    await gcmds.ratio(ctx.author, 'coinflip')
     return
 
 
 class Coinflip(commands.Cog):
-
     def __init__(self, bot):
         global gcmds
         self.bot = bot
-        gcmds = globalcommands.GlobalCMDS(self.bot)
+        gcmds = GlobalCMDS(self.bot)
         self.bot.loop.create_task(self.init_cf())
 
     async def init_cf(self):
         await self.bot.wait_until_ready()
         async with self.bot.db.acquire() as con:
-            await con.execute("CREATE TABLE IF NOT EXISTS coinflip(user_id bigint PRIMARY KEY, win NUMERIC DEFAULT 0, lose "
-                              "NUMERIC DEFAULT 0, ratio NUMERIC DEFAULT 0)")
+            await con.execute(
+                "CREATE TABLE IF NOT EXISTS coinflip(user_id bigint PRIMARY KEY, win NUMERIC DEFAULT 0, "
+                "lose NUMERIC DEFAULT 0)"
+            )
 
     @commands.command(aliases=['cf'],
                       desc="Gamble by flipping a coin",
@@ -126,8 +126,6 @@ class Coinflip(commands.Cog):
                                      description="The original coinflip message was deleted",
                                      color=discord.Color.dark_red())
             return await ctx.channel.send(embed=notFound)
-        if betAmount > 1000 and picked_side == side:
-            await message.pin()
 
 
 def setup(bot):

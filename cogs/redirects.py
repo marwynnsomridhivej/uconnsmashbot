@@ -2,17 +2,15 @@ import asyncio
 
 import discord
 from discord.ext import commands
-from utils import context, customerrors, globalcommands, paginator
+from utils import EmbedPaginator, GlobalCMDS, SubcommandHelp, customerrors
 
-gcmds = globalcommands.GlobalCMDS()
 reactions = ["✅", "🛑"]
 
 
 class Redirects(commands.Cog):
     def __init__(self, bot: commands.AutoShardedBot):
-        global gcmds
         self.bot = bot
-        gcmds = globalcommands.GlobalCMDS(self.bot)
+        self.gcmds = GlobalCMDS(self.bot)
         self.bot.loop.create_task(self.init_redirects())
 
     async def init_redirects(self):
@@ -22,48 +20,35 @@ class Redirects(commands.Cog):
                               "guild_id bigint, author_id bigint)")
 
     async def get_redirect_help(self, ctx):
-        rd = f"{await gcmds.prefix(ctx)}redirect"
-        description = (f"{ctx.author.mention}, the base command for redirects is `{rd}`. This command is used to instruct "
-                       "UconnSmashBot to redirect the output of a command to a specific channel. Redirects will only work "
-                       "for UconnSmashBot since UconnSmashBot cannot truly redirect other bots' outputs without causing some features "
-                       "to break.\n\nHere are the available subcommands for redirect")
-        rset = (f"**Usage:** `{rd} set [#channel] [command]*va`",
-                "**Returns:** A confirmation embed that requires the user to confirm that they would like the output for "
-                "these commands to be redirected to the specified channel",
-                "**Aliases:** `-s` `apply`",
-                "**Special Cases:** The `[command]*va` must be a list of commands separated by commas, or \"all\" "
-                "to set redirects for all commands")
-        rlist = (f"**Usage:** `{rd} list (#channel)`",
-                 "**Returns:** A list of all the redirects this server implements that redirect to the specified channel",
-                 "**Aliases:** `-ls` `show`",
-                 "**Special Cases:** If `(#channel)` is not specified, it will show all the redirects that this server "
-                 "implements for all commands with redirects")
-        rremove = (f"**Usage:** `{rd} remove [command]*va`",
-                   "**Returns:** A confirmation embed that requires the user to confirm they would like to remove the redirect "
-                   "for the specified commands",
-                   "**Aliases:** `-rm` `delete` `cancel`",
-                   "**Special Cases:** The `[command]*va` must be a list of commands separated by commas, or \"all\" to "
-                   "remove all redirects for all commands")
-        important_note = ("An important thing to note is that when setting the redirect for all commands at once, it will "
-                          "be assigned the type `all`, and when setting the redirect for specific commands or a list of commands, "
-                          "it will be assigned the type `override`. Essentially this means that when you set the redirect "
-                          "for a specific command, it will use that redirect, even if a global redirect was set. This is "
-                          "useful for when you want to redirect UconnSmashBot's output for all commmands to a specific channel "
-                          "EXCEPT for a couple commands. This is achieved by assigning their redirects seperately as stated above. "
-                          "Subcommand redirects are not supported, so the redirect will apply to all commands within the "
-                          "command group if the base command is a group.")
-
-        nv = [("Set", rset), ("List", rlist), ("Remove", rremove)]
-
-        embed = discord.Embed(title="Redirect Help", description=description, color=discord.Color.blue())
-        for name, value in nv:
-            embed.add_field(name=name, value="> " + "\n> ".join(value), inline=False)
-        embed.set_footer(text=important_note)
-
-        return await ctx.channel.send(embed=embed)
+        pfx = f"{await self.gcmds.prefix(ctx)}redirect"
+        embed = discord.Embed(
+            title="Redirect Help",
+            description=(
+                f"{ctx.author.mention}, the base command for redirects is `{pfx}`. This command is used to instruct "
+                "UconnSmashBot to redirect the output of a command to a specific channel. Redirects will only work "
+                "for UconnSmashBot since UconnSmashBot cannot truly redirect other bots' outputs without causing some features "
+                "to break.\n\nHere are the available subcommands for redirect"
+            ),
+            color=discord.Color.blue()
+        ).set_footer(
+            text=(
+                "An important thing to note is that when setting the redirect for all commands at once, it will "
+                "be assigned the type `all`, and when setting the redirect for specific commands or a list of commands, "
+                "it will be assigned the type `override`. Essentially this means that when you set the redirect "
+                "for a specific command, it will use that redirect, even if a global redirect was set. This is "
+                "useful for when you want to redirect UconnSmashBot's output for all commmands to a specific channel "
+                "EXCEPT for a couple commands. This is achieved by assigning their redirects seperately as stated above. "
+                "Subcommand redirects are not supported, so the redirect will apply to all commands within the "
+                "command group if the base command is a group"
+            )
+        )
+        return await SubcommandHelp(
+            pfx=pfx,
+            embed=embed
+        ).from_config("redirect").show_help(ctx)
 
     @commands.group(invoke_without_command=True,
-                    aliases=['rd'],
+                    aliases=['rd', "redirects"],
                     desc="Displays the help command for redirect",
                     usage="redirect")
     async def redirect(self, ctx):
@@ -74,7 +59,8 @@ class Redirects(commands.Cog):
     async def redirect_set(self, ctx, channel: discord.TextChannel, *, cmds: str):
         if cmds != "all":
             cmds = cmds.replace(" ", "").split(",")
-            realcmds = [name.lower() for name in cmds if name in [command.name.lower() for command in self.bot.commands]]
+            realcmds = [name.lower() for name in cmds if name in [command.name.lower()
+                                                                  for command in self.bot.commands]]
             if not realcmds:
                 raise customerrors.InvalidCommandSpecified()
             description = f"{ctx.author.mention}, the commands `{'` `'.join(realcmds)}` will be redirected to {channel.mention}."
@@ -84,12 +70,12 @@ class Redirects(commands.Cog):
             realcmds = None
             rtype = 'all'
 
-        panel = await gcmds.confirmation(ctx, description)
+        panel = await self.gcmds.confirmation(ctx, description)
         try:
             for reaction in reactions:
                 await panel.add_reaction(reaction)
         except Exception:
-            return await gcmds.cancelled(ctx, "set redirect")
+            return await self.gcmds.canceled(ctx, "set redirect")
 
         def reacted(reaction: discord.Reaction, user: discord.User):
             return reaction.emoji in reactions and user.id == ctx.author.id and reaction.message.id == panel.id
@@ -97,8 +83,8 @@ class Redirects(commands.Cog):
         try:
             result = await self.bot.wait_for("reaction_add", check=reacted, timeout=30)
         except asyncio.TimeoutError:
-            return await gcmds.timeout(ctx, "set redirect", 30)
-        await gcmds.smart_delete(panel)
+            return await self.gcmds.timeout(ctx, "set redirect", 30)
+        await self.gcmds.smart_delete(panel)
         if result[0].emoji == reactions[0]:
             try:
                 async with self.bot.db.acquire() as con:
@@ -110,7 +96,7 @@ class Redirects(commands.Cog):
                                 await con.execute(f"INSERT INTO redirects(type, command, channel_id, guild_id, author_id) VALUES {values}")
                             else:
                                 await con.execute(f"UPDATE redirects SET type='override', channel_id={channel.id}, "
-                                                f"author_id={ctx.author.id} WHERE command='{name}' AND guild_id={ctx.guild.id}")
+                                                  f"author_id={ctx.author.id} WHERE command='{name}' AND guild_id={ctx.guild.id}")
                     else:
                         for command in self.bot.commands:
                             result = await con.fetchval(f"SELECT type FROM redirects WHERE guild_id={ctx.guild.id} AND command='{command.name.lower()}'")
@@ -119,7 +105,7 @@ class Redirects(commands.Cog):
                                 await con.execute(f"INSERT INTO redirects(type, command, channel_id, guild_id, author_id) VALUES {values}")
                             else:
                                 await con.execute(f"UPDATE redirects SET type='all', channel_id={channel.id}, "
-                                                f"author_id={ctx.author.id} WHERE command='{command.name.lower()}' AND guild_id={ctx.guild.id}")
+                                                  f"author_id={ctx.author.id} WHERE command='{command.name.lower()}' AND guild_id={ctx.guild.id}")
             except Exception:
                 raise customerrors.RedirectSetError()
             embed = discord.Embed(title="Redirects Set Successfully",
@@ -127,9 +113,9 @@ class Redirects(commands.Cog):
                                   color=discord.Color.blue())
             return await ctx.channel.send(embed=embed)
         else:
-            return await gcmds.cancelled(ctx, "set redirect")
+            return await self.gcmds.canceled(ctx, "set redirect")
 
-    @redirect.command(aliases=['-ls', 'show', 'list'])
+    @redirect.command(aliases=['ls', 'show', 'list'])
     async def redirect_list(self, ctx):
         try:
             async with self.bot.db.acquire() as con:
@@ -138,20 +124,22 @@ class Redirects(commands.Cog):
         except Exception:
             raise customerrors.RedirectSearchError()
 
-        or_count = [f"`{ovr['command']}` ⟶ <#{ovr['channel_id']}> [*set by <@{ovr['author_id']}>*]" for ovr in overrides] if overrides else ["No overriding redirects exist"]
+        or_count = [f"`{ovr['command']}` ⟶ <#{ovr['channel_id']}> [*set by <@{ovr['author_id']}>*]" for ovr in overrides] if overrides else [
+            "No overriding redirects exist"]
         rg_count = f"{len(rglobal)} commands are globally redirected" if rglobal else "No global redirects exist"
 
-        pag = paginator.EmbedPaginator(ctx, entries=or_count, per_page=10, show_entry_count=False)
+        pag = EmbedPaginator(ctx, entries=or_count, per_page=10, show_entry_count=False)
         pag.embed.title = "Command Redirects"
         pag.embed.set_footer(text=rg_count)
         return await pag.paginate()
 
-    @redirect.command(aliases=['-rm', 'delete', 'cancel', 'remove'])
+    @redirect.command(aliases=['rm', 'delete', 'cancel', 'remove'])
     @commands.has_permissions(manage_guild=True)
     async def redirect_remove(self, ctx, *, cmds: str):
         if cmds != "all":
             cmds = cmds.replace(" ", "").split(",")
-            realcmds = [name.lower() for name in cmds if name in [command.name.lower() for command in self.bot.commands]]
+            realcmds = [name.lower() for name in cmds if name in [command.name.lower()
+                                                                  for command in self.bot.commands]]
             if not realcmds:
                 raise customerrors.InvalidCommandSpecified()
             description = f"{ctx.author.mention}, the commands `{'` `'.join(realcmds)}` will no longer be redirected."
@@ -161,12 +149,12 @@ class Redirects(commands.Cog):
             realcmds = None
             rtype = 'all'
 
-        panel = await gcmds.confirmation(ctx, description)
+        panel = await self.gcmds.confirmation(ctx, description)
         try:
             for reaction in reactions:
                 await panel.add_reaction(reaction)
         except Exception:
-            return await gcmds.cancelled(ctx, "remove redirect")
+            return await self.gcmds.canceled(ctx, "remove redirect")
 
         def reacted(reaction: discord.Reaction, user: discord.User):
             return reaction.emoji in reactions and user.id == ctx.author.id and reaction.message.id == panel.id
@@ -174,8 +162,8 @@ class Redirects(commands.Cog):
         try:
             result = await self.bot.wait_for("reaction_add", check=reacted, timeout=30)
         except asyncio.TimeoutError:
-            return await gcmds.timeout(ctx, "remove redirect", 30)
-        await gcmds.smart_delete(panel)
+            return await self.gcmds.timeout(ctx, "remove redirect", 30)
+        await self.gcmds.smart_delete(panel)
         if result[0].emoji == reactions[0]:
             try:
                 async with self.bot.db.acquire() as con:
@@ -192,7 +180,7 @@ class Redirects(commands.Cog):
                                   color=discord.Color.blue())
             return await ctx.channel.send(embed=embed)
         else:
-            return await gcmds.cancelled(ctx, "remove redirect")
+            return await self.gcmds.canceled(ctx, "remove redirect")
 
 
 def setup(bot):

@@ -1,28 +1,27 @@
 import math
+from utils.helpgenerator import SubcommandHelp
 
 import discord
 import pokepy
 from discord.ext import commands
-from utils import globalcommands
+from utils import GlobalCMDS
 
-gcmds = globalcommands.GlobalCMDS()
 poke_bot = pokepy.V2Client(cache='in_disk', cache_location="./pokepy_cache")
-move_status_icon_urls = ["https://oyster.ignimgs.com/mediawiki/apis.ign.com/pokemon-switch/e/ef/Physical.png?width=325",
-                         "https://oyster.ignimgs.com/mediawiki/apis.ign.com/pokemon-switch/2/24/Special.png?width=325",
-                         "https://oyster.ignimgs.com/mediawiki/apis.ign.com/pokemon-switch/d/d0/Status.png?width=325"]
+move_status_icon_urls = [
+    "https://oyster.ignimgs.com/mediawiki/apis.ign.com/pokemon-switch/e/ef/Physical.png?width=325",
+    "https://oyster.ignimgs.com/mediawiki/apis.ign.com/pokemon-switch/2/24/Special.png?width=325",
+    "https://oyster.ignimgs.com/mediawiki/apis.ign.com/pokemon-switch/d/d0/Status.png?width=325",
+]
 
 """
-German Translation for the ability command is thanks to Isabelle. Thank you so much. I wouldn't have been able to make
-high quality translations that are actually grammatically correct.
+German Translations and verification for the ability command is thanks to Isabelle. Thank you so much.
 """
 
 
 class Pokedex(commands.Cog):
-
     def __init__(self, bot):
-        global gcmds
         self.bot = bot
-        gcmds = globalcommands.GlobalCMDS(self.bot)
+        self.gcmds = GlobalCMDS(self.bot)
 
     def truncate(self, number: float, decimal_places: int) -> float:
         stepper = 10.0 ** decimal_places
@@ -234,42 +233,16 @@ class Pokedex(commands.Cog):
                     desc="Displays the help command for the pokedex",
                     usage="pokedex")
     async def pokedex(self, ctx):
-        panel = discord.Embed(title="Pokedex Commands",
-                              description=f"Access UconnSmashBot's Pokédex using `{await gcmds.prefix(ctx)}pokedex "
-                              f"[option]`. Please note that in order to avoid discrepancies in "
-                              f"versions, I have not included many of the game specific data.\n Here "
-                              f"is a list of all available `pokedex` options",
-                              color=discord.Color.blue())
-        panel.add_field(name="Pokémon",
-                        value=f"Usage: `{await gcmds.prefix(ctx)}pokedex pokemon [name]`\n"
-                        f"Returns: Details about the specified Pokémon\n"
-                        f"Aliases: `-p`",
-                        inline=False)
-        panel.add_field(name="Move",
-                        value=f"Usage: `{await gcmds.prefix(ctx)}pokedex move [name]`\n"
-                        f"Returns: Details about the move\n"
-                        f"Aliases: `moves` `-m`",
-                        inline=False)
-        panel.add_field(name="Ability",
-                        value=f"Usage: `{await gcmds.prefix(ctx)}pokedex ability [name] [optional flag]`\n"
-                        f"Returns: Details about the specified ability\n"
-                        f"Flag: `-de` `-en` or blank *(defaults to english)*\n"
-                        f"Aliases: `-a`",
-                        inline=False)
-        panel.add_field(name="Item",
-                        value=f"Usage: `{await gcmds.prefix(ctx)} pokedex item [name]`\n"
-                        f"Returns: Details about the item"
-                        f"Aliases: `-i`",
-                        inline=False)
-        panel.add_field(name="Type",
-                        value=f"Usage: `{await gcmds.prefix(ctx)}pokedex type [name]`\n"
-                        f"Returns: Details about that type"
-                        f"Flag: `-p` `-m` or blank *(defaults to none)*"
-                        f"Aliases: `-t`",
-                        inline=False)
-        return await ctx.channel.send(embed=panel)
+        pfx = f"{await self.gcmds.prefix(ctx)}pokedex"
+        return await SubcommandHelp(
+            pfx=pfx,
+            title="Pokedex Commands",
+            description=f"Access UconnSmashBot's Pokédex using `{pfx} [option]`. Please note "
+            "that in order to avoid discrepancies in versions, I have not included "
+            "many of the game specific data.\n Here is a list of all available `pokedex` options",
+        ).from_config("pokedex").show_help(ctx)
 
-    @pokedex.command(aliases=['-p'])
+    @pokedex.command(aliases=['p'])
     async def pokemon(self, ctx, *, pokemon_name: str):
         value = await self.get_dex_entry(pokemon_name)
         if value:
@@ -291,7 +264,7 @@ class Pokedex(commands.Cog):
                                     color=discord.Color.dark_red())
             return await ctx.channel.send(embed=invalid)
 
-    @pokedex.command(aliases=['-m', 'moves'])
+    @pokedex.command(aliases=['m', 'moves'])
     async def move(self, ctx, *, move_name: str):
         move_name_sent = move_name.replace(" ", "-").lower()
         value = await self.get_move_entry(move_name_sent)
@@ -308,7 +281,7 @@ class Pokedex(commands.Cog):
                                     color=discord.Color.dark_red())
             return await ctx.channel.send(embed=invalid)
 
-    @pokedex.command(aliases=['-a'])
+    @pokedex.command(aliases=['a'])
     async def ability(self, ctx, *, ability_name_with_flag: str):
         flag = ability_name_with_flag[-4:]
         if flag == " -de" or flag == " -en":
@@ -345,7 +318,7 @@ class Pokedex(commands.Cog):
                                         color=discord.Color.dark_red())
             return await ctx.channel.send(embed=invalid)
 
-    @pokedex.command(aliases=['-i'])
+    @pokedex.command(aliases=['i'])
     async def item(self, ctx, *, item_name: str):
         item_name_sent = item_name.replace(" ", "-").lower()
         value = await self.get_item_entry(item_name_sent)
@@ -362,7 +335,7 @@ class Pokedex(commands.Cog):
                                     color=discord.Color.dark_red())
             return await ctx.channel.send(embed=invalid)
 
-    @pokedex.command(aliases=['-t'])
+    @pokedex.command(aliases=['t'])
     async def type(self, ctx, *, type_name_flag: str):
         flag = type_name_flag[-3:]
         if flag == " -p" or flag == " -m":

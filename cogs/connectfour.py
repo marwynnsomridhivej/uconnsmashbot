@@ -1,11 +1,12 @@
 import asyncio
 import random
-import discord
-from discord.ext import commands
-from utils import globalcommands
-import numpy as np
 
-gcmds = globalcommands.GlobalCMDS()
+import discord
+import numpy as np
+from discord.ext import commands
+from utils import GlobalCMDS
+
+gcmds = GlobalCMDS()
 
 ROW_COUNT = 6
 COLUMN_COUNT = 7
@@ -119,8 +120,6 @@ async def win(ctx, member: discord.Member, bot: commands.AutoShardedBot):
             await con.execute(f"INSERT INTO connectfour(user_id, win) VALUES ({ctx.author.id}, 1)")
         else:
             await con.execute(f"UPDATE connectfour SET win = win + 1 WHERE user_id = {ctx.author.id}")
-    await gcmds.ratio(ctx.author, 'connectfour')
-    return
 
     spell = "credits"
     random_number = random.randint(1, 100001)
@@ -161,9 +160,7 @@ async def win(ctx, member: discord.Member, bot: commands.AutoShardedBot):
     rewardEmbed = discord.Embed(title=title,
                                 description=f"{member.mention}, you won ```{award_amount} {spell}!```",
                                 color=discord.Color.blue())
-    rewardMessage = await ctx.channel.send(embed=rewardEmbed)
-    if award_amount == 1000000:
-        await rewardMessage.pin(reason=f"{member.name} hit the jackpot for winning a game of Connect Four!")
+    return await ctx.channel.send(embed=rewardEmbed)
 
 
 async def lose(ctx, member: discord.Member, bot: commands.AutoShardedBot):
@@ -173,7 +170,6 @@ async def lose(ctx, member: discord.Member, bot: commands.AutoShardedBot):
             await con.execute(f"INSERT INTO connectfour(user_id, lose) VALUES ({ctx.author.id}, 1)")
         else:
             await con.execute(f"UPDATE connectfour SET lose = lose + 1 WHERE user_id = {ctx.author.id}")
-    await gcmds.ratio(member, 'connectfour')
     return
 
 
@@ -185,23 +181,23 @@ async def draw(ctx, member: discord.Member, bot: commands.AutoShardedBot):
                 await con.execute(f"INSERT INTO connectfour(user_id, tie) VALUES ({user.id}, 1)")
             else:
                 await con.execute(f"UPDATE connectfour SET tie = tie + 1 WHERE user_id = {user.id}")
-        await gcmds.ratio(user, 'connectfour')
     return
 
 
 class ConnectFour(commands.Cog):
-
     def __init__(self, bot):
         global gcmds
         self.bot = bot
-        gcmds = globalcommands.GlobalCMDS(self.bot)
+        gcmds = GlobalCMDS(self.bot)
         self.bot.loop.create_task(self.init_c4())
 
     async def init_c4(self):
         await self.bot.wait_until_ready()
         async with self.bot.db.acquire() as con:
-            await con.execute("CREATE TABLE IF NOT EXISTS connectfour(user_id bigint PRIMARY KEY, win NUMERIC DEFAULT 0, lose "
-                              "NUMERIC DEFAULT 0, tie NUMERIC DEFAULT 0, ratio NUMERIC DEFAULT 0)")
+            await con.execute(
+                "CREATE TABLE IF NOT EXISTS connectfour(user_id bigint PRIMARY KEY, win NUMERIC DEFAULT 0, lose "
+                "NUMERIC DEFAULT 0, tie NUMERIC DEFAULT 0)"
+            )
 
     @commands.command(aliases=['connectfour', 'c4', 'conn', 'connect'],
                       desc="Connect Four in Discord!",
@@ -270,7 +266,7 @@ class ConnectFour(commands.Cog):
                     choice = await self.bot.wait_for('reaction_add', timeout=60.0,
                                                      check=check)
                 except asyncio.TimeoutError:
-                    await message.clear_reactions()
+                    await gcmds.smart_clear(message)
                     canceled = discord.Embed(title="Game Timeout",
                                              description="ConnectFour game canceled due to inactivity, "
                                                          "create a new game",
@@ -303,7 +299,7 @@ class ConnectFour(commands.Cog):
                             description = f"{member.mention} canceled the game"
                             valid = True
                         if valid:
-                            await message.clear_reactions()
+                            await gcmds.smart_clear(message)
                             c4 = discord.Embed(title="Connect Four Game Canceled",
                                                description=description,
                                                color=discord.Color.dark_red())
@@ -327,7 +323,7 @@ class ConnectFour(commands.Cog):
                             description = f"{member.mention}'s turn\n\n{printed_board}"
                             confirm_turn = True
                             if winning_move(board, 1):
-                                await message.clear_reactions()
+                                await gcmds.smart_clear(message)
                                 printed_board = print_board(board)
                                 c4 = discord.Embed(title="Connect Four",
                                                    description=f"{ctx.author.mention} wins!\n\n{printed_board}",
@@ -359,7 +355,7 @@ class ConnectFour(commands.Cog):
                             description = f"{ctx.author.mention}'s turn\n\n{printed_board}"
                             confirm_turn = True
                             if winning_move(board, 2):
-                                await message.clear_reactions()
+                                await gcmds.smart_clear(message)
                                 printed_board = print_board(board)
                                 c4 = discord.Embed(title="Connect Four",
                                                    description=f"{member.mention} wins!\n\n{printed_board}",

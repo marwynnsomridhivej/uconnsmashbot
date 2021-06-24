@@ -1,20 +1,30 @@
-# Thank you to Rapptz (Danny) from the discord.py Discord server for this paginator example
 import asyncio
+from contextlib import suppress
 
 import discord
 from discord.ext import commands
 
-from utils import customerrors, globalcommands
+from utils import customerrors, GlobalCMDS
 
-gcmds = globalcommands.GlobalCMDS()
+
+__all__ = (
+    "EmbedPaginator",
+    "FieldPaginator",
+    "SubcommandPaginator",
+)
+
+
+gcmds = GlobalCMDS()
 
 
 class EmbedPaginator:
-    def __init__(self, ctx, *, entries, per_page=10, show_entry_count=True):
+    def __init__(self, ctx, *, entries, per_page=10, show_entry_count=True, **kwargs):
         self.bot = ctx.bot
         self.ctx = ctx
         self.entries = entries
-        self.message = ctx.message
+        self.provided_message = kwargs.get("provided_message", None)
+        self.edit_provided_message = self.provided_message is not None
+        self.message = self.provided_message or ctx.message
         self.channel = ctx.channel
         self.author = ctx.author
         self.per_page = per_page
@@ -22,7 +32,7 @@ class EmbedPaginator:
         if left_over:
             pages += 1
         self.maximum_pages = pages
-        self.embed = discord.Embed(color=discord.Color.blue())
+        self.embed = kwargs.get("embed", discord.Embed(color=discord.Color.blue()))
         self.paginating = len(entries) > per_page
         self.show_entry_count = show_entry_count
         self.emojis = [
@@ -35,6 +45,8 @@ class EmbedPaginator:
             ('ℹ️', self.show_help)
         ]
         self.in_help = False
+        self.show_index = kwargs.get("show_index", True)
+        self.description = kwargs.get("description", None)
 
         if ctx.guild:
             self.permissions = self.channel.permissions_for(ctx.guild.me)
@@ -65,7 +77,8 @@ class EmbedPaginator:
         return self.embed
 
     def prepare_embed(self, entries, page, *, first=False):
-        desc_list = [f'**{index}.** {entry}' for index, entry in enumerate(entries, 1 + ((page - 1) * self.per_page))]
+        desc_list = [f'{f"**{index}.** " if self.show_index else ""}{entry}'
+                     for index, entry in enumerate(entries, 1 + ((page - 1) * self.per_page))]
         if self.maximum_pages > 1:
             if self.show_entry_count:
                 text = f'Page {page}/{self.maximum_pages} ({len(self.entries)} entries)'
@@ -77,7 +90,10 @@ class EmbedPaginator:
             desc_list.append('')
             desc_list.append('React with ℹ️ for help')
 
-        self.embed.description = '\n'.join(desc_list)
+        if self.description:
+            self.embed.description = self.description + '\n'.join(desc_list)
+        else:
+            self.embed.description = '\n'.join(desc_list)
 
     async def show_page(self, page, *, first=False):
         self.current_page = page
@@ -86,18 +102,23 @@ class EmbedPaginator:
         embed = self.get_embed(entries, page, first=first)
 
         if not self.paginating:
-            return await self.channel.send(content=content, embed=embed)
+            if self.edit_provided_message:
+                await self.provided_message.edit(content=content, embed=embed)
+            else:
+                return await self.channel.send(content=content, embed=embed)
 
         if not first:
+            return await self.message.edit(content=content, embed=embed)
+
+        if self.edit_provided_message and first:
             await self.message.edit(content=content, embed=embed)
-            return
-
-        self.message = await self.channel.send(content=content, embed=embed)
-        for (reaction, function) in self.emojis:
-            if self.maximum_pages == 2 and reaction in ('⏮️', '⏭️'):
-                continue
-
-            await self.message.add_reaction(reaction)
+        elif not self.edit_provided_message and first:
+            self.message = await self.channel.send(content=content, embed=embed)
+        if not self.maximum_pages <= 1:
+            for reaction, _ in self.emojis:
+                if self.maximum_pages <= 2 and reaction in ('⏮️', '⏭️'):
+                    continue
+                await self.message.add_reaction(reaction)
 
     async def checked_show_page(self, page):
         if page != 0 and page <= self.maximum_pages:
@@ -170,7 +191,7 @@ class EmbedPaginator:
         embed = self.embed.copy()
         embed.clear_fields()
         embed.title = "Paginator Help"
-        embed.description = (f"{self.author.mention}, here are the controls for the paginator:\n\n"
+        embed.description = (f"{self.author.mention}, here are the controls for the paginator:\n\n" +
                              '\n'.join(desc))
         embed.set_footer(
             text=f"Original paginator left on page {self.current_page}. Press ⏹️ to return to original paginator")
@@ -178,10 +199,8 @@ class EmbedPaginator:
         self.in_help = True
 
     async def stop_pages(self):
-        try:
-            await self.message.delete()
-        except Exception:
-            pass
+        with suppress(Exception):
+            await self.message.clear_reactions()
         self.paginating = False
 
     async def rem_reaction(self, payload):
@@ -192,10 +211,8 @@ class EmbedPaginator:
         if member_converted.bot:
             return
 
-        try:
+        with suppress(Exception):
             await self.message.remove_reaction(payload.emoji, member_converted)
-        except Exception:
-            pass
 
     def react_check(self, payload):
         self.bot.loop.create_task(self.rem_reaction(payload))
@@ -239,18 +256,71 @@ class EmbedPaginator:
             await self.match()
 
 
-class FieldPages(EmbedPaginator):
+class FieldPaginator(EmbedPaginator):
+    def __init__(self, ctx, *, entries, per_page=10, show_entry_count=True, **kwargs):
+        super().__init__(ctx, entries=entries, per_page=per_page,
+                         show_entry_count=show_entry_count, **kwargs)
+        self.footer = kwargs.get("footer", None)
+        self.icon_url = kwargs.get("icon_url", None)
+        if kwargs.get('embed', None):
+            self.embed = kwargs.get("embed")
+
     def prepare_embed(self, entries, page, *, first=False):
         self.embed.clear_fields()
-        self.embed.description = discord.Embed.Empty
 
-        for key, value in entries:
-            self.embed.add_field(name=key, value=value, inline=False)
+        for key, value, inline in entries:
+            self.embed.add_field(name=key, value=value, inline=inline)
 
-        if self.maximum_pages > 1:
-            if self.show_entry_count:
-                text = f'Page {page}/{self.maximum_pages} ({len(self.entries)} entries)'
+        if self.footer:
+            if self.icon_url:
+                self.embed.set_footer(text=self.footer, icon_url=self.icon_url)
             else:
-                text = f'Page {page}/{self.maximum_pages}'
+                self.embed.set_footer(text=self.footer)
+        else:
+            if self.maximum_pages > 1:
+                if self.show_entry_count:
+                    text = f'Page {page}/{self.maximum_pages} ({len(self.entries)} entries)'
+                else:
+                    text = f'Page {page}/{self.maximum_pages}'
 
-            self.embed.set_footer(text=text)
+                if not self.footer and not self.icon_url:
+                    self.embed.set_footer(text=text)
+                elif not self.footer and self.icon_url:
+                    self.embed.set_footer(text=text, icon_url=self.icon_url)
+                elif self.icon_url:
+                    self.embed.set_footer(text=self.footer, icon_url=self.icon_url)
+                else:
+                    self.embed.set_footer(text=self.footer)
+
+
+class SubcommandPaginator(FieldPaginator):
+    def __init__(self, ctx, *, entries, per_page=10, show_entry_count=True, **kwargs):
+        super().__init__(ctx, entries=entries, per_page=per_page,
+                         show_entry_count=show_entry_count, **kwargs)
+
+    def prepare_embed(self, entries, page, *, first=False):
+        self.embed.clear_fields()
+
+        for key, value, inline in entries:
+            self.embed.add_field(name=key, value="> " + "\n> ".join(value), inline=inline)
+
+        if self.footer:
+            if self.icon_url:
+                self.embed.set_footer(text=self.footer, icon_url=self.icon_url)
+            else:
+                self.embed.set_footer(text=self.footer)
+        else:
+            if self.maximum_pages > 1:
+                if self.show_entry_count:
+                    text = f'Page {page}/{self.maximum_pages} ({len(self.entries)} entries)'
+                else:
+                    text = f'Page {page}/{self.maximum_pages}'
+
+                if not self.footer and not self.icon_url:
+                    self.embed.set_footer(text=text)
+                elif not self.footer and self.icon_url:
+                    self.embed.set_footer(text=text, icon_url=self.icon_url)
+                elif self.icon_url:
+                    self.embed.set_footer(text=self.footer, icon_url=self.icon_url)
+                else:
+                    self.embed.set_footer(text=self.footer)

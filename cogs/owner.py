@@ -1,102 +1,91 @@
+import asyncio
+import copy
 import os
 import subprocess
-import sys
+import typing
+from contextlib import suppress
 from datetime import datetime
-from io import BytesIO, StringIO
+from io import BytesIO
 
+from aiohttp import ClientSession
 import discord
 from asyncpg.exceptions import UniqueViolationError
 from discord.ext import commands
+from discord.ext.commands import AutoShardedBot, Context
 from discord.ext.commands.errors import CommandInvokeError
-from utils import customerrors, globalcommands, paginator
+from utils import EmbedPaginator, GlobalCMDS, customerrors
 
-gcmds = globalcommands.GlobalCMDS()
 OWNER_PERM = ["Bot Owner Only"]
 
 
 class Owner(commands.Cog):
-
-    def __init__(self, bot):
-        global gcmds
+    def __init__(self, bot: AutoShardedBot):
         self.bot = bot
-        gcmds = globalcommands.GlobalCMDS(self.bot)
-        self.bot.loop.create_task(self.init_blacklist())
-        self.bot.loop.create_task(self.init_balance())
+        self.gcmds = GlobalCMDS(self.bot)
+        self.bot.loop.create_task(self._init_tables())
 
-    async def get_owner(self):
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild: discord.Guild) -> discord.Message:
+        owner = await self.get_owner()
+        return await owner.send(
+            embed=discord.Embed(
+                title="New Guild Joined!",
+                description=f"{owner.mention}, I just joined {guild.name}!",
+                color=discord.Color.blue(),
+            ).add_field(
+                name="Info",
+                value="\n".join([
+                    f"ID: `{guild.id}`",
+                    f"Owner: `{guild.owner or 'Unknown'}`",
+                    f"Members: `{guild.member_count}`",
+                ]),
+                inline=False,
+            ).set_thumbnail(
+                url=guild.icon_url,
+            )
+        )
+
+    @commands.Cog.listener()
+    async def on_guild_remove(self, guild: discord.Guild) -> discord.Message:
+        owner = await self.get_owner()
+        return await owner.send(
+            embed=discord.Embed(
+                title="Left Guild",
+                description=f"{owner.mention}, I just left {guild.name}",
+                color=discord.Color.dark_red(),
+            ).set_thumbnail(
+                url=guild.icon_url,
+            )
+        )
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member: discord.Member) -> discord.Message:
+        owner = await self.get_owner()
+        users = len(self.bot.users)
+        if users % 1000 == 0:
+            return await owner.send(
+                embed=discord.Embed(
+                    title="Milestone Reached!",
+                    description=f"{owner.mention}, UconnSmashBot is now serving {users} users!",
+                    color=discord.Color.blue(),
+                )
+            )
+
+    async def get_owner(self) -> discord.User:
         await self.bot.wait_until_ready()
         owner = self.bot.get_user(self.bot.owner_id)
         return owner
 
-    async def init_blacklist(self):
+    async def _init_tables(self):
         async with self.bot.db.acquire() as con:
-            await con.execute("CREATE TABLE IF NOT EXISTS blacklist (type text, id bigint PRIMARY KEY)")
+            await con.execute("CREATE TABLE IF NOT EXISTS balance (user_id bigint PRIMARY KEY, amount NUMERIC)")
 
-    async def init_balance(self):
-        async with self.bot.db.acquire() as con:
-            await con.execute("CREATE TABLE IF NOT EXISTS balance (user_id bigint PRIMARY KEY, amount bigint)")
-
-    async def get_premium_users(self, guild, op):
-        async with self.bot.db.acquire() as con:
-            result = await con.fetch("SELECT user_id FROM premium WHERE user_id IS NOT NULL ORDER BY id")
-        if not result:
-            raise customerrors.NoGlobalPremiumUsers() if op != "guild" else customerrors.NoPremiumUsers()
-        else:
-            if op != "guild":
-                return [self.bot.get_user(int(user['user_id'])) for user in result]
-            else:
-                return [self.bot.get_user(int(user['user_id'])) for user in result if int(user['user_id']) in [member.id for member in guild.members]]
-
-    async def get_premium_guilds(self):
-        async with self.bot.db.acquire() as con:
-            result = await con.fetch("SELECT guild_id FROM premium WHERE guild_id IS NOT NULL ORDER BY id")
-        if not result:
-            raise customerrors.NoPremiumGuilds()
-        else:
-            return [self.bot.get_guild(int(guild['guild_id'])) for guild in result]
-
-    async def op_user_premium(self, op: str, user: discord.User) -> bool:
+    @staticmethod
+    def _handle_task(task: asyncio.Task) -> None:
         try:
-            async with self.bot.db.acquire() as con:
-                if op == "set":
-                    await con.execute(f"INSERT INTO premium(user_id) VALUES ({user.id})")
-                elif op == "remove":
-                    await con.execute(f"DELETE FROM premium WHERE user_id = {user.id}")
-            return True
-        except UniqueViolationError:
-            raise customerrors.UserAlreadyPremium(user)
-        except Exception:
-            raise customerrors.UserPremiumException(user)
-
-    async def op_guild_premium(self, op: str, guild: discord.Guild) -> bool:
-        try:
-            owner = await self.get_owner()
-            async with self.bot.db.acquire() as con:
-                if op == "set":
-                    await con.execute(f"INSERT INTO premium(guild_id) VALUES ({guild.id})")
-                    embed = discord.Embed(title=f"{guild.name} is now a UconnSmashBot Premium Server",
-                                          description=f"{guild.owner.mention}, {owner.mention} has granted {guild.name} a "
-                                          f"never expiring UconnSmashBot Premium subscription. Thank you for being a supporter of UconnSmashBot!",
-                                          color=discord.Color.blue())
-                    embed.set_footer(text=f"Although this version of UconnSmashBot Premium will never expire, it can be "
-                                     f"revoked at any time at the discretion of {owner.name}")
-                elif op == "remove":
-                    await con.execute(f"DELETE FROM premium WHERE guild_id = {guild.id}")
-                    embed = discord.Embed(title=f"{guild.name} is no longer a UconnSmashBot Premium Server",
-                                          description=f"{guild.owner.mention}, the UconnSmashBot Premium subscription for "
-                                          f"{guild.name} has been revoked. Please contact {owner.mention} if you "
-                                          "believe this was a mistake",
-                                          color=discord.Color.dark_red())
-            try:
-                await guild.owner.send(embed=embed)
-            except Exception:
-                pass
-            return True
-        except UniqueViolationError:
-            raise customerrors.GuildAlreadyPremium(guild)
-        except Exception:
-            raise customerrors.GuildPremiumException(guild)
-        return
+            task.result()
+        except asyncio.CancelledError:
+            pass
 
     @commands.group(invoke_without_command=True,
                     aliases=['g'],
@@ -223,7 +212,124 @@ class Owner(commands.Cog):
                                       description="Bot is logging out",
                                       color=discord.Color.blue())
         await ctx.channel.send(embed=shutdownEmbed)
-        await self.bot.close()
+
+        async def close():
+            await asyncio.sleep(1.0)
+            await self.bot.close()
+        self.bot.loop.create_task(close())
+
+    @commands.command(desc="Runs a command as a different user",
+                      usage="sudo [@member] (#channel) [invocation]",
+                      uperms=OWNER_PERM,
+                      note="This is only authorised for debugging purposes, such "
+                      "as testing permissions. Always obtain consent to sudo invoke "
+                      "as another member")
+    @commands.is_owner()
+    async def sudo(self, ctx: commands.Context, member: discord.Member, channel: typing.Optional[discord.TextChannel], *, invocation: str):
+        message = copy.copy(ctx.message)
+        channel = channel or ctx.channel
+        message.channel = channel
+        message.author = channel.guild.get_member(member.id) or member
+        message.content = f"m!{invocation}"
+        new_context = await self.bot.get_context(message, cls=type(ctx))
+        reactions = ["✅", "❌"]
+        embed = discord.Embed(title="Confirm Grant Sudo Privileges",
+                              description=f"{member.mention}, in order to allow {ctx.author.mention} "
+                              f"to invoke `{invocation}` under your name, react with ✅, to deny react with ❌",
+                              color=discord.Color.blue())
+        panel = await ctx.channel.send(embed=embed)
+        for reaction in reactions:
+            with suppress(Exception):
+                await panel.add_reaction(reaction)
+
+        def other_reacted(reaction: discord.Reaction, user: discord.User):
+            return reaction.message.id == panel.id and user.id == member.id and str(reaction.emoji) in reactions
+
+        try:
+            reaction, user = await self.bot.wait_for("reaction_add", check=other_reacted, timeout=30)
+        except asyncio.TimeoutError:
+            return await self.gcmds.canceled(ctx, "sudo invoke")
+        else:
+            if reaction.emoji == reactions[0]:
+                await new_context.channel.send(content=f"**{ctx.author}** invoked "
+                                               f"`{invocation}` with sudo as **{member}**")
+                await self.bot.invoke(new_context)
+            else:
+                embed = discord.Embed(title="Sudo Privileges Denied",
+                                      description=f"{ctx.author.mention}, you were not give "
+                                      "sudo privileges, and the command invocation was canceled",
+                                      color=discord.Color.dark_red())
+                return await ctx.channel.send(embed=embed)
+        finally:
+            await self.gcmds.smart_delete(panel)
+
+    @commands.command(desc="Runs all commands in a cog",
+                      usage="cogexec [cog]",
+                      uperms=OWNER_PERM)
+    @commands.is_owner()
+    async def cogexec(self, ctx, cog_name: str):
+        cog = self.bot.get_cog(f"{cog_name}")
+        if not cog:
+            embed = discord.Embed(title="No Cog Found",
+                                  description=f"{ctx.author.mention}, there was no cog named `{cog_name}`",
+                                  color=discord.Color.dark_red())
+        else:
+            try:
+                for command in cog.walk_commands():
+                    message = copy.copy(ctx.message)
+                    message.content = f"m!{command.name}"
+                    new_context = await self.bot.get_context(message, cls=type(ctx))
+                    await new_context.reinvoke()
+                    await asyncio.sleep(1.5)
+            except Exception as e:
+                embed = discord.Embed(title="Error Occurred",
+                                      description=f"```Command: {command.name}\n\n{e}```",
+                                      color=discord.Color.dark_red())
+            else:
+                embed = discord.Embed(title="Cog Commands Executed Successfully",
+                                      description=f'{ctx.author.mention}, all commands in this cog were '
+                                      'successfully executed',
+                                      color=discord.Color.blue())
+        return await ctx.channel.send(embed=embed)
+
+    @commands.command(desc="Runs a command multiple times",
+                      usage="multexec (amount) [invocation]",
+                      uperms=OWNER_PERM,
+                      note="`(amount)` is how many times a command is to be run")
+    @commands.is_owner()
+    async def multexec(self, ctx, amount: int = 1, *, invocation: str):
+        for _ in range(amount):
+            message = copy.copy(ctx.message)
+            message.content = f"m!{invocation}"
+            new_context = await self.bot.get_context(message, cls=type(ctx))
+            task = self.bot.loop.create_task(self.bot.invoke(new_context))
+            task.add_done_callback(self._handle_task)
+        embed = discord.Embed(
+            title="Command Invoked Successfully",
+            description=f"{ctx.author.mention}, `{message.content}` was "
+            f"successfully invoked {amount} times",
+            color=discord.Color.blue()
+        )
+        return await ctx.channel.send(embed=embed)
+
+    @commands.command(desc="Runs a commands multiple times, but awaits each command",
+                      usage="multexecawait (amount) [invocation]",
+                      uperms=OWNER_PERM,
+                      note="`(amount)` is how many times a command is to be run")
+    @commands.is_owner()
+    async def multexecawait(self, ctx: Context, amount: int = 1, *, invocation: str):
+        message = copy.copy(ctx.message)
+        message.content = f"m!{invocation}"
+        new_context = await self.bot.get_context(message, cls=type(ctx))
+        for _ in range(amount):
+            await new_context.reinvoke()
+        embed = discord.Embed(
+            title="Command Invoked Successfully",
+            description=f"{ctx.author.mention}, `{message.content}` was "
+            f"successfully invoked {amount} times",
+            color=discord.Color.blue()
+        )
+        return await ctx.channel.send(embed=embed)
 
     @commands.group(aliases=['balanceadmin', 'baladmin', 'balop'],
                     desc="Manages all user balances",
@@ -254,7 +360,7 @@ class Owner(commands.Cog):
 
         op = (f"INSERT INTO balance(user_id, amount) VALUES ({user.id}, {amount}) ON CONFLICT (user_id) "
               f"DO UPDATE SET amount = {amount} WHERE balance.user_id = {user.id}")
-        await gcmds.balance_db(op)
+        await self.gcmds.balance_db(op)
 
         if amount != 1:
             spell = "credits"
@@ -286,8 +392,8 @@ class Owner(commands.Cog):
             return await ctx.channel.send(embed=invalid)
 
         op = (f"UPDATE balance SET amount = amount + {amount} WHERE user_id = {user.id}")
-        await gcmds.balance_db(op)
-        balance = await gcmds.balance_db(f"SELECT amount FROM balance WHERE user_id = {user.id}", ret_val=True)
+        await self.gcmds.balance_db(op)
+        balance = await self.gcmds.balance_db(f"SELECT amount FROM balance WHERE user_id = {user.id}", ret_val=True)
 
         if balance != 1:
             spell = "credits"
@@ -325,10 +431,10 @@ class Owner(commands.Cog):
             return await ctx.channel.send(embed=invalid)
 
         op = (f"UPDATE balance SET amount = amount - {amount} WHERE user_id = {user.id}")
-        await gcmds.balance_db(op)
-        balance = await gcmds.balance_db(f"SELECT amount FROM balance WHERE user_id = {user.id}", ret_val=True)
+        await self.gcmds.balance_db(op)
+        balance = await self.gcmds.balance_db(f"SELECT amount FROM balance WHERE user_id = {user.id}", ret_val=True)
         if balance < 0:
-            await gcmds.balance_db(f"UPDATE balance set amount = 0 WHERE user_id = {user.id}")
+            await self.gcmds.balance_db(f"UPDATE balance set amount = 0 WHERE user_id = {user.id}")
             balance = 0
 
         if balance != 1:
@@ -346,178 +452,6 @@ class Owner(commands.Cog):
                                                 f"balance is now ```{balance} {spell}```",
                                     color=discord.Color.blue())
         return await ctx.channel.send(embed=removeEmbed)
-
-    @commands.group(invoke_without_command=True,
-                    aliases=['blist'],
-                    desc="Sets the blacklists for users and/or servers",
-                    usage="blacklist (subcommand)",
-                    uperms=OWNER_PERM)
-    @commands.is_owner()
-    async def blacklist(self, ctx):
-        return
-
-    @blacklist.command(aliases=['member', 'user'])
-    @commands.is_owner()
-    async def _user(self, ctx, operation, user: discord.Member = None):
-        if not user:
-            invalid = discord.Embed(title="Invalid User",
-                                    description=f"{ctx.author.mention}, please specify a valid user",
-                                    color=discord.Color.dark_red())
-            return await ctx.channel.send(embed=invalid)
-
-        try:
-            user_id = user.id
-        except (TypeError, AttributeError):
-            invalid = discord.Embed(title="Invalid User",
-                                    description=f"{ctx.author.mention}, please specify a valid user",
-                                    color=discord.Color.dark_red())
-            return await ctx.channel.send(embed=invalid)
-        if operation == "add":
-            op = f"INSERT INTO blacklist(type, id) VALUES('user', {user.id}) ON CONFLICT DO NOTHING"
-            await gcmds.blacklist_db(op)
-            b_add = discord.Embed(title="Blacklist Entry Added",
-                                  description=f"{ctx.author.mention}, {user.mention} has been added to the "
-                                              f"blacklist",
-                                  color=discord.Color.blue())
-            await ctx.channel.send(embed=b_add)
-        elif operation == "remove":
-            op = f"DELETE FROM blacklist WHERE type = 'user' AND id = {user.id}"
-            await gcmds.blacklist_db(op)
-            b_remove = discord.Embed(title="Blacklist Entry Removed",
-                                     description=f"{ctx.author.mention}, {user.mention} has been removed from "
-                                                 f"the blacklist",
-                                     color=discord.Color.blue())
-            await ctx.channel.send(embed=b_remove)
-        else:
-            invalid = discord.Embed(title="Invalid Operation",
-                                    description=f"{ctx.author.mention}, `{operation}` is an invalid operation",
-                                    color=discord.Color.dark_red())
-            await ctx.channel.send(embed=invalid)
-
-    @blacklist.command(aliases=['server', 'guild'])
-    @commands.is_owner()
-    async def _guild(self, ctx, operation, *, server_id: int = None):
-        if server_id is None:
-            invalid = discord.Embed(title="Invalid Guild ID",
-                                    description=f"{ctx.author.mention}, please provide a valid guild ID",
-                                    color=discord.Color.dark_red())
-            return await ctx.channel.send(embed=invalid)
-
-        try:
-            guild = await self.bot.fetch_guild(int(server_id))
-        except (TypeError, AttributeError):
-            invalid = discord.Embed(title="Invalid Guild ID",
-                                    description=f"{ctx.author.mention}, please specify a valid guild ID",
-                                    color=discord.Color.dark_red())
-            return await ctx.channel.send(embed=invalid)
-        if operation == "add":
-            op = f"INSERT INTO blacklist(type, id) VALUES('guild', {guild.id}) ON CONFLICT DO NOTHING"
-            await gcmds.blacklist_db(op)
-            b_add = discord.Embed(title="Blacklist Entry Added",
-                                  description=f"{ctx.author.mention}, {guild.name} `ID:{guild.id}` has been added "
-                                              f"to the blacklist",
-                                  color=discord.Color.blue())
-            await ctx.channel.send(embed=b_add)
-        elif operation == "remove":
-            op = f"DELETE FROM blacklist WHERE id = {guild.id} AND type = 'guild'"
-            await gcmds.blacklist_db(op)
-            b_remove = discord.Embed(title="Blacklist Entry Removed",
-                                     description=f"{ctx.author.mention}, {guild.name} `ID:{guild.id}` has been "
-                                                 f"removed from the blacklist",
-                                     color=discord.Color.blue())
-            await ctx.channel.send(embed=b_remove)
-        else:
-            invalid = discord.Embed(title="Invalid Operation",
-                                    description=f"{ctx.author.mention}, `{operation}` is an invalid operation",
-                                    color=discord.Color.dark_red())
-            await ctx.channel.send(embed=invalid)
-
-    @commands.command(aliases=['fleave'],
-                      desc="Forces the bot to leave a server",
-                      usage="forceleave (server_id)",
-                      uperms=OWNER_PERM,
-                      note="If `(server_id)` is unspecified, the bot will leave the current "
-                      "server the invocation context is in")
-    @commands.is_owner()
-    async def forceleave(self, ctx, guild_id=None):
-        if guild_id is None:
-            guild_id = ctx.guild.id
-        await self.bot.get_guild(guild_id).leave()
-        leaveEmbed = discord.Embed(title="Successfully Left Server",
-                                   description=f"Left guild id: {id}",
-                                   color=discord.Color.blue())
-        await ctx.author.send(embed=leaveEmbed)
-
-    @commands.is_owner()
-    @commands.group(invoke_without_command=True,
-                    desc="Not Implemented",
-                    usage="No Implementation",
-                    uperms=OWNER_PERM)
-    async def premium(self, ctx):
-        return
-
-    @commands.is_owner()
-    @premium.group(invoke_without_command=True, aliases=['set', '-s'])
-    async def set_premium(self, ctx):
-        return
-
-    @set_premium.command(aliases=['user', '-u'])
-    @commands.is_owner()
-    async def users(self, ctx, user: discord.User, pm: bool = False):
-        op = "set" if pm else "remove"
-        title = f"{user} is now UconnSmashBot Premium!" if pm else f"{user} is no longer UconnSmashBot Premium"
-        description = (f"{ctx.author.mention} set {user.mention} to UconnSmashBot Premium" if pm
-                       else f"{ctx.author.mention} removed {user.mention}'s UconnSmashBot Premium")
-        color = discord.Color.blue() if pm else discord.Color.dark_red()
-        await self.op_user_premium(op, user)
-        embed = discord.Embed(title=title, description=description, color=color)
-        return await ctx.channel.send(embed=embed)
-
-    @set_premium.command(aliases=['guild', '-g'])
-    @commands.is_owner()
-    async def guilds(self, ctx, pm: bool = False):
-        op = "set" if pm else "remove"
-        title = f"{ctx.guild.name} is now UconnSmashBot Premium!" if pm else f"{ctx.guild.name} is no longer UconnSmashBot Premium"
-        description = (f"{ctx.author.mention} set {ctx.guild.name} to UconnSmashBot Premium" if pm
-                       else f"{ctx.author.mention} removed {ctx.guild.name}'s UconnSmashBot Premium")
-        color = discord.Color.blue() if pm else discord.Color.dark_red()
-        await self.op_guild_premium(op, ctx.guild)
-        embed = discord.Embed(title=title, description=description, color=color)
-        return await ctx.channel.send(embed=embed)
-
-    @premium.group(invoke_without_command=True, aliases=['list', '-l', '-ls'])
-    @commands.is_owner()
-    async def list_premium(self, ctx):
-        return
-
-    @list_premium.command(aliases=['users', '-u'])
-    @commands.is_owner()
-    async def user(self, ctx, source: str = "guild"):
-        op = source if source == "guild" else "global"
-        entries = [f"{user.mention} - {user.name}" for user in await self.get_premium_users(ctx.guild, op)]
-        pag = paginator.EmbedPaginator(ctx, entries=entries, per_page=10, show_entry_count=True)
-        pag.embed.title = f"UconnSmashBot Premium Users in {ctx.guild.name}" if op == "guild" else "UconnSmashBot Premium Users"
-        return await pag.paginate()
-
-    @list_premium.command(aliases=['guilds', '-g'])
-    @commands.is_owner()
-    async def guild(self, ctx):
-        entries = [f"{guild.name}" for guild in await self.get_premium_guilds()]
-        pag = paginator.EmbedPaginator(ctx, entries=entries, per_page=10, show_entry_count=True)
-        pag.embed.title = "UconnSmashBot Premium Servers"
-        return await pag.paginate()
-
-    @commands.command(aliases=['dm', 'privatemessage'],
-                      desc="Sends a user a DM",
-                      usage="privatemessage [user] [message]")
-    @commands.is_owner()
-    async def privateMessage(self, ctx, user: discord.User, *, message):
-        dmEmbed = discord.Embed(title="UconnSmashBot",
-                                description=message,
-                                color=discord.Color.blue())
-        await user.send(embed=dmEmbed)
-        dmEmbed.set_footer(text=f"Copy of DM sent to {user}")
-        await ctx.author.send(embed=dmEmbed)
 
 
 def setup(bot):

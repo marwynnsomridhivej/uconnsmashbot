@@ -8,30 +8,29 @@ import aiohttp
 import discord
 from discord.ext import commands
 from num2words import num2words
-from utils import globalcommands
+from utils import GlobalCMDS, SubcommandHelp, customerrors
 
-gcmds = globalcommands.GlobalCMDS()
 timeout = 120
-channel_tag_rx = re.compile(r'<#[0-9]{18}>')
-channel_id_rx = re.compile(r'[0-9]{18}')
-api_key = gcmds.env_check("TENOR_API")
+channel_tag_rx = re.compile(r'<#[\d]{18}>')
+channel_id_rx = re.compile(r'[\d]{18}')
+api_key = os.getenv("TENOR_API")
 
 
 class Welcome(commands.Cog):
-
     def __init__(self, bot):
-        global gcmds
         self.bot = bot
-        gcmds = globalcommands.GlobalCMDS(self.bot)
+        self.gcmds = GlobalCMDS(self.bot)
         self.bot.loop.create_task(self.init_welcomer())
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
-        await self.send_welcomer(member)
+        if not self.bot._raid_mode_data.get(member.guild.id, False):
+            await self.send_welcomer(member)
 
     @commands.Cog.listener()
     async def on_member_remove(self, member: discord.Member):
-        await self.send_leaver(member)
+        if not self.bot._raid_mode_data.get(member.guild.id, False):
+            await self.send_leaver(member)
 
     async def init_welcomer(self):
         await self.bot.wait_until_ready()
@@ -99,40 +98,21 @@ class Welcome(commands.Cog):
                                         color=discord.Color.dark_red())
             leave_embed.set_thumbnail(url=member.avatar_url)
             leave_embed.set_image(url="https://media1.tenor.com/images/e69ebde3631408c200777ebe10f84367/tenor.gif?"
-                                    "itemid=5081296")
+                                  "itemid=5081296")
             return await channel_to_send.send(embed=leave_embed)
 
     async def get_welcome_help(self, ctx) -> discord.Message:
-        title = "Welcomer Help Menu"
-        description = f"{ctx.author.mention}, the welcomer is used to greet new members of your server when they join. " \
-            f"The base command is `{await gcmds.prefix(ctx)}welcomer [option]` *alias=welcome*. Here are the valid " \
-            "options for `[option]`\n\n"
-        create = f"**Usage:** `{await gcmds.prefix(ctx)}welcomer create`\n" \
-            "**Returns:** An interactive setup panel that will create a working welcomer in your server\n" \
-            "**Aliases:** `make` `start` `-c`\n" \
-            "**Special Cases:** You will be unable to use this command if you already have a welcomer set up. If you" \
-            " try to use this command when you already have a welcomer set up, it will automatically redirect you to " \
-            "the interactive edit panel"
-        edit = f"**Usage:** `{await gcmds.prefix(ctx)}welcomer edit`\n" \
-            "**Returns:** An interactive setup panel that will edit your current welcomer\n" \
-            "**Aliases:** `adjust` `modify` `-e`\n" \
-            "**Special Cases:** You must have a welcomer currently set up in this server to use this command"
-        delete = f"**Usage:** `{await gcmds.prefix(ctx)}welcomer delete`\n" \
-            "**Returns:** A confirmation panel that will delete your current welcomer if you choose to do so\n" \
-            "**Aliases:** `trash` `cancel` `-rm`\n" \
-            "**Special Cases:** You must have a welcomer currently set up in this server to use this command"
-        test = (f"**Usage:** `{await gcmds.prefix(ctx)}welcomer test`\n"
-                "**Returns:** A test welcomer in your currently set welcome channel")
-        fields = [("Create", create), ("Edit", edit), ("Delete", delete), ("Test", test)]
-
-        embed = discord.Embed(title=title,
-                              description=description,
-                              color=discord.Color.blue())
-        for name, value in fields:
-            embed.add_field(name=name,
-                            value=value,
-                            inline=False)
-        return await ctx.channel.send(embed=embed)
+        pfx = f"{await self.gcmds.prefix(ctx)}welcomer"
+        return await SubcommandHelp(
+            pfx=pfx,
+            title="Welcomer Help Menu",
+            description=(
+                f"{ctx.author.mention}, the welcomer is used to greet new members of your server when they join. "
+                f"The base command is `{pfx} [option]` *alias=welcome*. Here are the valid "
+                "options for `[option]`"
+            ),
+            per_page=2,
+        ).from_config("welcomer").show_help(ctx)
 
     async def check_panel(self, panel: discord.Message) -> bool:
         try:
@@ -216,7 +196,7 @@ class Welcome(commands.Cog):
         op.append(f"title = '{title}'") if title else op.append(f"title = 'New Member Joined!'")
         op.append(f"description = '{description}'") if description else op.append(
             "description = 'Welcome to {server_name}! {user_mention} is our {member_count_ord} member!'"
-            )
+        )
         if media:
             if media == "default":
                 op.append("media = NULL")
@@ -246,29 +226,16 @@ class Welcome(commands.Cog):
             return False
 
     async def get_leaver_help(self, ctx) -> discord.Message:
-        title = "Leaver Help"
-        description = (f"{ctx.author.mention}, the leaver function will automatically send a goodbye message in the "
-                       f"welcomer's channel once a member leaves the server. The base command is "
-                       f"`{await gcmds.prefix(ctx)}leaver [option]`. Here are the valid options for `[option]`\n\n")
-        create = (f"**Usage:** `{await gcmds.prefix(ctx)}leaver create`\n"
-                  "**Returns:** An embed that details the status of the leaver creation\n"
-                  "**Aliases:** `-c` `make` `start`\n"
-                  "**Special Cases:** Only works if there is a welcomer set up")
-        delete = (f"**Usage:** `{await gcmds.prefix(ctx)}leaver delete`\n"
-                  "**Returns:** An embed that details the status of the leaver deletion\n"
-                  "**Aliases:** `-rm` `trash` `cancel`\n"
-                  "**Special Cases:** Only works if there is a welcomer and leaver set up")
-        test = (f"**Usage:** `{await gcmds.prefix(ctx)}leaver test`\n"
-                "**Returns:** A test leaver in your currently set welcome channel")
-        fields = [("Create", create), ("Delete", delete), ("Test", test)]
-        embed = discord.Embed(title=title,
-                              description=description,
-                              color=discord.Color.blue())
-        for name, value in fields:
-            embed.add_field(name=name,
-                            value=value,
-                            inline=False)
-        return await ctx.channel.send(embed=embed)
+        pfx = f"{await self.gcmds.prefix(ctx)}leaver"
+        return await SubcommandHelp(
+            pfx=pfx,
+            title="Leaver Help",
+            description=(
+                f"{ctx.author.mention}, the leaver function will automatically send a goodbye message in the "
+                f"welcomer's channel once a member leaves the server. The base command is "
+                f"`{pfx} [option]`. Here are the valid options for `[option]`\n\n"
+            )
+        ).from_config("leaver").show_help(ctx)
 
     async def create_leaver(self, ctx) -> bool:
         if await self.has_leaver(ctx):
@@ -339,10 +306,10 @@ class Welcome(commands.Cog):
             try:
                 edit_success = await self.edit_panel(ctx, panel, title=None, description=description)
                 if not edit_success:
-                    return await gcmds.panel_deleted(gcmds, ctx, cmd_title)
+                    return await self.gcmds.panel_deleted(self.gcmds, ctx, cmd_title)
                 result = await self.bot.wait_for("message", check=from_user, timeout=timeout)
             except asyncio.TimeoutError:
-                return await gcmds.timeout(ctx, cmd_title, timeout)
+                return await self.gcmds.timeout(ctx, cmd_title, timeout)
             if re.match(channel_tag_rx, result.content):
                 channel_id = result.content[2:20]
                 break
@@ -350,10 +317,15 @@ class Welcome(commands.Cog):
                 channel_id = result.content
                 break
             elif result.content == "cancel":
-                return await gcmds.cancelled(ctx, cmd_title)
+                return await self.gcmds.canceled(ctx, cmd_title)
             else:
                 continue
-        await gcmds.smart_delete(result)
+        await self.gcmds.smart_delete(result)
+        channel = ctx.guild.get_channel(int(channel_id))
+        perms = ctx.guild.me.permissions_in(channel)
+        if not perms.send_messages:
+            await self.gcmds.smart_delete(panel)
+            raise customerrors.CannotMessageChannel(channel)
 
         description = f"{ctx.author.mention}, please enter the title of the welcome embed, {or_default}\n\n" \
             "Default Value: New Member Joined!"
@@ -362,17 +334,17 @@ class Welcome(commands.Cog):
         try:
             edit_success = await self.edit_panel(ctx, panel, title=None, description=description)
             if not edit_success:
-                return await gcmds.panel_deleted(gcmds, ctx, cmd_title)
+                return await self.gcmds.panel_deleted(self.gcmds, ctx, cmd_title)
             result = await self.bot.wait_for("message", check=from_user, timeout=timeout)
         except asyncio.TimeoutError:
-            return await gcmds.timeout(ctx, cmd_title, timeout)
+            return await self.gcmds.timeout(ctx, cmd_title, timeout)
         if result.content == "cancel":
-            return await gcmds.cancelled(ctx, cmd_title)
+            return await self.gcmds.canceled(ctx, cmd_title)
         elif result.content == "skip":
             embed_title = None
         else:
             embed_title = result.content
-        await gcmds.smart_delete(result)
+        await self.gcmds.smart_delete(result)
 
         bot_count = 0
         for member in ctx.guild.members:
@@ -393,17 +365,17 @@ class Welcome(commands.Cog):
         try:
             edit_success = await self.edit_panel(ctx, panel, title=None, description=description)
             if not edit_success:
-                return await gcmds.panel_deleted(gcmds, ctx, cmd_title)
+                return await self.gcmds.panel_deleted(self.gcmds, ctx, cmd_title)
             result = await self.bot.wait_for("message", check=from_user, timeout=timeout)
         except asyncio.TimeoutError:
-            return await gcmds.timeout(ctx, cmd_title, timeout)
+            return await self.gcmds.timeout(ctx, cmd_title, timeout)
         if result.content == "cancel":
-            return await gcmds.cancelled(ctx, cmd_title)
+            return await self.gcmds.canceled(ctx, cmd_title)
         elif result.content == "skip":
             embed_description = None
         else:
             embed_description = result.content
-        await gcmds.smart_delete(result)
+        await self.gcmds.smart_delete(result)
 
         # User provides media links
         url_list = []
@@ -418,12 +390,12 @@ class Welcome(commands.Cog):
             try:
                 edit_success = await self.edit_panel(ctx, panel, title=None, description=description)
                 if not edit_success:
-                    return await gcmds.panel_deleted(gcmds, ctx, cmd_title)
+                    return await self.gcmds.panel_deleted(self.gcmds, ctx, cmd_title)
                 result = await self.bot.wait_for("message", check=from_user, timeout=120)
             except asyncio.TimeoutError:
-                return await gcmds.timeout(ctx, cmd_title, 120)
+                return await self.gcmds.timeout(ctx, cmd_title, 120)
             if result.content == "cancel":
-                return await gcmds.cancelled(ctx, cmd_title)
+                return await self.gcmds.canceled(ctx, cmd_title)
             elif result.content == "skip":
                 url_list = None
                 break
@@ -433,9 +405,9 @@ class Welcome(commands.Cog):
                 mimetype, encoding = mimetypes.guess_type(result.content)
                 if mimetype and mimetype in ["image/gif", "image/jpeg", "image/jpg", "image/png"]:
                     url_list.append(result.content)
-                    await gcmds.smart_delete(result)
+                    await self.gcmds.smart_delete(result)
                 continue
-        await gcmds.smart_delete(result)
+        await self.gcmds.smart_delete(result)
 
         succeeded = await self.create_welcomer(ctx, channel_id, embed_title, embed_description, url_list)
         if succeeded:
@@ -503,28 +475,30 @@ class Welcome(commands.Cog):
             try:
                 edit_success = await self.edit_panel(ctx, panel, title=None, description=description)
                 if not edit_success:
-                    return await gcmds.panel_deleted(gcmds, ctx, cmd_title)
+                    return await self.gcmds.panel_deleted(self.gcmds, ctx, cmd_title)
                 result = await self.bot.wait_for("message", check=from_user, timeout=timeout)
             except asyncio.TimeoutError:
-                return await gcmds.timeout(ctx, cmd_title, timeout)
+                return await self.gcmds.timeout(ctx, cmd_title, timeout)
             if result.content == "cancel":
-                try:
-                    await temp_welcomer.delete()
-                except Exception:
-                    pass
-                return await gcmds.cancelled(ctx, cmd_title)
+                await self.gcmds.smart_delete(temp_welcomer)
+                return await self.gcmds.canceled(ctx, cmd_title)
             elif result.content == "skip" or result.content == "default":
                 new_channel_id = info[0]
                 break
-            elif re.match(result.content, channel_tag_rx):
+            elif re.match(channel_tag_rx, result.content):
                 new_channel_id = result.content[2:20]
                 break
-            elif re.match(result.content, channel_id_rx):
+            elif re.match(channel_id_rx, result.content):
                 new_channel_id = result.content
                 break
             else:
                 continue
-        await gcmds.smart_delete(result)
+        await self.gcmds.smart_delete(result)
+        channel = ctx.guild.get_channel(int(new_channel_id))
+        perms = ctx.guild.me.permissions_in(channel)
+        if not perms.send_messages:
+            await self.gcmds.smart_delete(panel)
+            raise customerrors.CannotMessageChannel(channel)
 
         description = f"{ctx.author.mention}, please enter the title of the welcomer you would like " \
             f"UconnSmashBot to display, {or_default}\n\nCurrent Title: {info[1]}"
@@ -533,23 +507,20 @@ class Welcome(commands.Cog):
         try:
             edit_success = await self.edit_panel(ctx, panel, title=None, description=description)
             if not edit_success:
-                return await gcmds.panel_deleted(gcmds, ctx, cmd_title)
+                return await self.gcmds.panel_deleted(self.gcmds, ctx, cmd_title)
             result = await self.bot.wait_for("message", check=from_user, timeout=timeout)
         except asyncio.TimeoutError:
-            return await gcmds.timeout(ctx, cmd_title, timeout)
+            return await self.gcmds.timeout(ctx, cmd_title, timeout)
         if result.content == "cancel":
-            try:
-                await temp_welcomer.delete()
-            except Exception:
-                pass
-            return await gcmds.cancelled(ctx, cmd_title)
+            await self.gcmds.smart_delete(temp_welcomer)
+            return await self.gcmds.canceled(ctx, cmd_title)
         elif result.content == "skip":
             new_title = info[1]
         elif result.content == "default":
             new_title = None
         else:
             new_title = result.content
-        await gcmds.smart_delete(result)
+        await self.gcmds.smart_delete(result)
 
         # Update temp_welcomer
 
@@ -557,7 +528,7 @@ class Welcome(commands.Cog):
             temp_welcomer_embed.title = new_title
             await temp_welcomer.edit(embed=temp_welcomer_embed)
         except (discord.NotFound, discord.HTTPException, discord.Forbidden):
-            return await gcmds.cancelled(ctx, cmd_title)
+            return await self.gcmds.canceled(ctx, cmd_title)
 
         # Edit panel description
         bot_count = 0
@@ -580,23 +551,23 @@ class Welcome(commands.Cog):
         try:
             edit_success = await self.edit_panel(ctx, panel, title=None, description=description)
             if not edit_success:
-                return await gcmds.panel_deleted(gcmds, ctx, cmd_title)
+                return await self.gcmds.panel_deleted(self.gcmds, ctx, cmd_title)
             result = await self.bot.wait_for("message", check=from_user, timeout=timeout)
         except asyncio.TimeoutError:
-            return await gcmds.timeout(ctx, cmd_title, timeout)
+            return await self.gcmds.timeout(ctx, cmd_title, timeout)
         if result.content == "cancel":
             try:
                 await temp_welcomer.delete()
             except Exception:
                 pass
-            return await gcmds.cancelled(ctx, cmd_title)
+            return await self.gcmds.canceled(ctx, cmd_title)
         elif result.content == "skip":
             new_description = info[2]
         elif result.content == "default":
             new_description = None
         else:
             new_description = result.content
-        await gcmds.smart_delete(result)
+        await self.gcmds.smart_delete(result)
 
         # User provides media links
         url_list = []
@@ -611,16 +582,16 @@ class Welcome(commands.Cog):
             try:
                 edit_success = await self.edit_panel(ctx, panel, title=None, description=description)
                 if not edit_success:
-                    return await gcmds.panel_deleted(gcmds, ctx, cmd_title)
+                    return await self.gcmds.panel_deleted(self.gcmds, ctx, cmd_title)
                 result = await self.bot.wait_for("message", check=from_user, timeout=120)
             except asyncio.TimeoutError:
-                return await gcmds.timeout(ctx, cmd_title, 120)
+                return await self.gcmds.timeout(ctx, cmd_title, 120)
             if result.content == "cancel":
                 try:
                     await temp_welcomer.delete()
                 except Exception:
                     pass
-                return await gcmds.cancelled(ctx, cmd_title)
+                return await self.gcmds.canceled(ctx, cmd_title)
             elif result.content == "skip":
                 url_list = None
                 break
@@ -633,9 +604,9 @@ class Welcome(commands.Cog):
                 mimetype, encoding = mimetypes.guess_type(result.content)
                 if mimetype and mimetype in ["image/gif", "image/jpeg", "image/jpg", "image/png"]:
                     url_list.append(result.content)
-                await gcmds.smart_delete(result)
+                await self.gcmds.smart_delete(result)
                 continue
-        await gcmds.smart_delete(result)
+        await self.gcmds.smart_delete(result)
 
         succeeded = await self.edit_welcomer(ctx, new_channel_id, new_title, new_description, url_list)
         await temp_welcomer.delete()
@@ -660,7 +631,7 @@ class Welcome(commands.Cog):
                                       color=discord.Color.dark_red())
                 return await ctx.channel.send(embed=embed)
 
-    @welcomer.command(aliases=['-rm', 'trash', 'cancel'])
+    @welcomer.command(aliases=['rm', 'trash', 'cancel'])
     @commands.has_permissions(manage_guild=True)
     async def delete(self, ctx):
         info = await self.get_welcomer(ctx)
@@ -690,12 +661,12 @@ class Welcome(commands.Cog):
             try:
                 result = await self.bot.wait_for("reaction_add", check=user_reacted, timeout=timeout)
             except asyncio.TimeoutError:
-                return await gcmds.timeout(ctx, cmd_title, timeout)
+                return await self.gcmds.timeout(ctx, cmd_title, timeout)
             if result[0].emoji in reactions:
                 break
             else:
                 continue
-        await panel.clear_reactions()
+        await self.gcmds.smart_clear(panel)
 
         if result[0].emoji == "✅":
             succeeded = await self.delete_welcomer(ctx)
@@ -743,14 +714,6 @@ class Welcome(commands.Cog):
                                   color=discord.Color.dark_red())
             return await ctx.channel.send(embed=embed)
 
-        def from_user(message: discord.Message) -> bool:
-            if message.author.id == ctx.author.id and message.channel.id == ctx.channel.id:
-                return True
-            else:
-                return False
-
-        channel_id = welcomer[0]
-
         succeeded = await self.create_leaver(ctx)
         if succeeded:
             embed = discord.Embed(title="Leaver Successfully Created",
@@ -763,7 +726,7 @@ class Welcome(commands.Cog):
                                   color=discord.Color.dark_red())
         return await ctx.channel.send(embed=embed)
 
-    @leaver.command(aliases=['-rm', 'cancel', 'trash', 'delete'])
+    @leaver.command(aliases=['rm', 'cancel', 'trash', 'delete'])
     @commands.has_permissions(manage_guild=True)
     async def _delete(self, ctx):
         if not await self.has_leaver(ctx):

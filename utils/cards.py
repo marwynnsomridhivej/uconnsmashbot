@@ -1,3 +1,9 @@
+__all__ = (
+    "playing_cards",
+    "uno_thumbnail",
+    "uno_cards",
+)
+
 playing_cards = {
     "Two": {
         "Hearts": "<:2H:738096935692402819>",
@@ -77,6 +83,7 @@ playing_cards = {
         "Spades": "<:AS:738097037186170921>",
         "Clubs": "<:AC:738097070233092208>",
     },
+    "_CardBack": "<:cardback:738063418832978070>"
 }
 
 
@@ -260,5 +267,6 @@ uno_cards = {
     },
     "wild": {
         "black": "<:wild:739620056551653537>",
-    }
+    },
+    "back": "<:unoback:739620076180865062>",
 }
