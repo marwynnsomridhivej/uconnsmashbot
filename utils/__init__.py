@@ -11,5 +11,4 @@ from .mbplayer import MBPlayer
 from .musicutils import *
 from .objects import *
 from .paginator import *
-from .setuppanel import SetupPanel
 from .spotifyparser import *

@@ -4,7 +4,8 @@ import discord
 from discord.embeds import EmptyEmbed
 from discord.ext import commands
 from discord.ext.commands import AutoShardedBot, Context
-from utils import GlobalCMDS, SetupPanel
+from utils import GlobalCMDS
+from setuppanel import SetupPanel
 
 _BLUE = discord.Color.blue()
 _HEX_COLOR_RX = re.compile(r'#[A-Fa-f0-9]{6}')
