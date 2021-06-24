@@ -1,0 +1,1460 @@
+{
+    "actions": {
+        "Block": {
+            "desc": "Blocks specified users from performing action commands directed at you",
+            "usage": "block [@user]*va (flag)",
+            "returns": "An embed that confirms your block has been set",
+            "note": "`(flag)` can be \"all\" to block everyone in the server"
+        },
+        "Unblock": {
+            "desc": "Unblocks specified users, allowing them to perform action commands directed at you",
+            "usage": "unblock [@user]*va (flag)",
+            "returns": "An embed that confirms your unblock has been set",
+            "note": "`(flag)` can be \"all\" to block everyone in the server"
+        }
+    },
+    "autoreply": {
+        "List": {
+            "desc": "List all active autoreplies",
+            "usage": "list (@target)",
+            "returns": "A paginated panel of all autoreplies currently active and unexpired in this server",
+            "aliases": [
+                "ls",
+                "show"
+            ],
+            "note": "If `(@target)` is specified, it will display the autoreply currently set for the mentioned user. Otherwise, it will display the autoreply currently set where you are its target"
+        },
+        "Create": {
+            "desc": "Create an autoreply",
+            "usage": "create [@target]",
+            "returns": "An interactive setup panel to create your autoreply",
+            "aliases": [
+                "c",
+                "make"
+            ],
+            "note": "If `(@target)` is specified, it will display the autoreply currently set for the mentioned user. Otherwise, it will display the autoreply currently set where you are its target"
+        },
+        "Edit": {
+            "desc": "Edit an autoreply",
+            "usage": "edit [@target]",
+            "returns": "An interactive setup panel to edit your autoreply",
+            "aliases": [
+                "e",
+                "modify"
+            ],
+            "note": "`[@target]` refers to the @mention of the target your autoreply is assigned to. You may only edit autoreplies that you have created, or that you are the target of"
+        },
+        "Delete": {
+            "desc": "Delete an autoreply",
+            "usage": "delete [@target]",
+            "returns": "An embed that details the status of the autoreply delete",
+            "aliases": [
+                "del",
+                "d",
+                "remove"
+            ],
+            "note": "You may only delete autoreplies that you have created, or that you are the target of"
+        },
+        "Activate": {
+            "desc": "Activate an autoreply",
+            "usage": "activate [@target]",
+            "returns": "An embed that details the activation status of the autoreply",
+            "aliases": [
+                "ac",
+                "enable"
+            ],
+            "note": "You may only activate autoreplies that you have created, or that you are the target of"
+        },
+        "Deactivate": {
+            "desc": "Deactivate an autoreply",
+            "usage": "deactivate [@target]",
+            "returns": "An embed that details the activation status of the autoreply",
+            "aliases": [
+                "deac",
+                "disable"
+            ],
+            "note": "You may only deactivate autoreplies that you have created, or that you are the target of"
+        }
+    },
+    "report": {
+        "Bug": {
+            "desc": "Dispatch a bug report",
+            "usage": "bug [message]",
+            "returns": "A confirmation message if the bug report dispatches successfully",
+            "aliases": [
+                "issue"
+            ],
+            "note": "Please contact the developers in the support server instead. This command is depreciated and scheduled for removal"
+        },
+        "Update": {
+            "desc": "Dispatch an update to announcement channel",
+            "usage": "update [message]",
+            "returns": "A confirmation panel that, once confirmed, will dispatch an update to the support announcement channel",
+            "aliases": [
+                "fix",
+                "patch"
+            ],
+            "uperms": [
+                "Bot Owner Only"
+            ]
+        }
+    },
+    "disboard": {
+        "Create": {
+            "desc": "Create a Disboard bump reminder",
+            "usage": "create",
+            "returns": "An interactive setup panel that will create your Disboard bump reminder",
+            "aliases": [
+                "c",
+                "make",
+                "start"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "You must have the Disboard bot in your server, otherwise the command will fail"
+        },
+        "Edit": {
+            "desc": "Edit a Disboard bump reminder",
+            "usage": "edit",
+            "returns": "An interactive setup panel that will edit your current Disboard bump reminder",
+            "aliases": [
+                "e",
+                "modify",
+                "adjust"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "You must satisfy the special case for `create` and currently have a working bump reminder set"
+        },
+        "Delete": {
+            "desc": "Deletes a Disboard bump reminder",
+            "usage": "delete",
+            "returns": "A confirmation panel that, once confirmed, will delete your current Disboard bump reminder",
+            "aliases": [
+                "d",
+                "del",
+                "trash"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "You must satisfy the special case for `edit`"
+        },
+        "Invite": {
+            "desc": "Shows how to invite the Disboard bot",
+            "usage": "invite",
+            "returns": "An embed that details how to get the Disboard bot in your server"
+        }
+    },
+    "gather": {
+        "Create": {
+            "desc": "Create a gatherer",
+            "usage": "create [#channel]",
+            "returns": "An interactive setup panel that will create your gatherer",
+            "aliases": [
+                "set"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "You may only have one gatherer active at a time per channel"
+        },
+        "Expire": {
+            "desc": "Forcefully expires a gatherer",
+            "usage": "expire [#channel]",
+            "returns": "A confirmation panel that, once confirmed, will expire your gatherer",
+            "aliases": [
+                "finish"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "This will finish gathering and display results. If you would like to completely delete it and not show results, use `delete`"
+        },
+        "Delete": {
+            "desc": "Deletes a gatherer",
+            "usage": "delete [#channel]",
+            "returns": "A confirmation panel that, once confirmed, will delete your gatherer",
+            "aliases": [
+                "unset"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "If you would like to finish gathering and get the results, use `expire`"
+        },
+        "List": {
+            "desc": "List all active gatherers",
+            "usage": "list",
+            "returns": "An embed listing all active gatherers in the server and their relevant information",
+            "aliases": [
+                "ls",
+                "show"
+            ]
+        },
+        "Peek": {
+            "desc": "Display the current results of an active gatherer",
+            "usage": "peek [#channel]",
+            "returns": "An embed listing all responses gathered so far by the gatherer in the specified channel"
+        }
+    },
+    "level": {
+        "Help": {
+            "desc": "Shows help information for the `level` subcomnmands",
+            "usage": "help",
+            "returns": "A paginated embed that details help information for `level` subcommands",
+            "aliases": [
+                "h"
+            ]
+        },
+        "Enable": {
+            "desc": "Enables leveling",
+            "usage": "enable (#channel)*va",
+            "returns": "An embed that confirms that leveling has been enabled",
+            "aliases": [
+                "on"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "If `(#channel)*va` is unspecified, it will apply the action across all server channels"
+        },
+        "Disable": {
+            "desc": "Disables leveling",
+            "usage": "disable (#channel)*va",
+            "returns": "An embed that confirms that leveling has been disabled",
+            "aliases": [
+                "off"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "Leveling must be enabled in order for it to be disabled. If `(#channel)*va` is unspecified, it will apply the action across all server channels"
+        },
+        "XP per Minute": {
+            "desc": "Display or adjust the current average XP per minute",
+            "usage": "xpperminute (value)",
+            "returns": "A panel that will allow you to adjust the average XP per minute",
+            "aliases": [
+                "xpm",
+                "xppermin"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "`(value)` must be a positive integer value between 1 and 10000 (inclusive). If `(value)` is not specified, it will display the current average XP per minute. Adjusting the XP per minute only impacts your server"
+        },
+        "Frequency": {
+            "desc": "Display or adjust the current frequency of XP distribution",
+            "usage": "frequency (value)",
+            "returns": "A panel that will show or allow you to adjust the minumum XP cooldown duration",
+            "aliases": [
+                "freq",
+                "rate"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "`(value)` must be a positive integer value between 1 and 60 (inclusive). `(value)` represents the cooldown (in minutes) for a server member to receive XP after the last time they were given XP. If `(value)` is not specified, it will display the server's current frequency in minutes. 1 minute is the minimum to discourage spam"
+        },
+        "Reroute": {
+            "desc": "Reroutes level-up messages to a specified channel",
+            "usage": "reroute [#channel]",
+            "returns": "An embed that confirms the level-up messages will be redirected to the specified channel",
+            "aliases": [
+                "redirect"
+            ],
+            "uperms": [
+                "Manage Server"
+            ]
+        },
+        "Unroute": {
+            "desc": "Disable rerouting level-up messages to a specific channel",
+            "usage": "unroute",
+            "returns": "An embed that confirms the level-up messages will no longer be redirected to a specific channel",
+            "aliases": [
+                "unredirect"
+            ],
+            "uperms": [
+                "Manage Server"
+            ]
+        },
+        "Notify": {
+            "desc": "Set the level-up notification level",
+            "usage": "notify [mode] (status)",
+            "returns": "An embed that confirms the level-up notifications for the specified mode was changed to the specified status",
+            "aliases": [
+                "notif",
+                "notifs"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "`[mode]` can be \"server\" *(\"s\")* or \"global\" *(\"g\")*, and `(status)` can be \"true\" *(\"t\")* or \"false\" *(\"f\")*. If `(status)` is not specified or is not one of the previously mentioned valid values, it will act as a toggle for `[mode]`"
+        },
+        "About": {
+            "desc": "Shows a detailed overview about UconnSmashBot's leveling feature",
+            "usage": "about",
+            "returns": "An embed that contains a detailed overview about UconnSmashBot's leveling feature",
+            "aliases": [
+                "info"
+            ]
+        }
+    },
+    "levelroles": {
+        "Give": {
+            "desc": "Assign a levelrole to be given",
+            "usage": "give [level] [type] [@role]*va",
+            "returns": "An embed that confirms those role rewards were successfully added",
+            "aliases": [
+                "set"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "`[level]` should be an integer value between 1 and 100 inclusive, `[type]` can be \"add\" *(\"a\")* or \"replace\" *(\"r\")* to specify if the previous roles obtained should be kept or if the new roles will replace the old roles"
+        },
+        "Remove": {
+            "desc": "Removes a levelrole from the current levelroles to be given",
+            "usage": "remove [level] [@role]*va",
+            "returns": "A confirmation panel that once confirmed, will remove the selected roles from the role rewards at the specified level",
+            "aliases": [
+                "unset"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "If `(@role)*va` is not specified, it will remove all role rewards for the specified level"
+        },
+        "Reset": {
+            "desc": "Removes all levelroles from the current levelroles to be given for all users and bots",
+            "usage": "reset",
+            "returns": "A confirmation panel that, once confirmed, will remove ALL role rewards for ALL levels",
+            "aliases": [
+                "clear"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "This action cannot be undone, and will remove ALL role rewards for ALL levels"
+        },
+        "List": {
+            "desc": "Lists all levelroles",
+            "usage": "list (level)",
+            "returns": "An embed that displays the role rewards for the specified level",
+            "aliases": [
+                "show",
+                "ls"
+            ],
+            "note": "If `(level)` is not specified, it will display ALL the role rewards that are set"
+        },
+        "Change Level": {
+            "desc": "Changes a level required to obtain the specified role to the specified level",
+            "usage": "changelevel [level] [@role]",
+            "returns": "A confirmation panel that, once confirmed, will set the level required to obtain `[@role]` as a role reward to the specified level",
+            "aliases": [
+                "cl",
+                "levelchange"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "`[level]` must be between 1 and 100. If no role rewards currently exist for the specified level, it will automatically create one with the same role rewarding behavior as its current level. If that role is the only role for it's current level role reward, it will keep the role reward, just adjust the level"
+        },
+        "Change Type": {
+            "desc": "Changes the behavior of the role reward at the specified level",
+            "usage": "changetype [type] [level]",
+            "returns": "A confirmation panel, that once confirmed, will set the type of the role rewarding behavior for the specified level",
+            "aliases": [
+                "ct",
+                "typechange"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "If `(level)` is unspecified, it will set all currently active role rewards to the type specified by `[type]`. `[type]` can be \"add\" *(\"a\")* or \"replace\" *(\"r\")* to specify if the previous roles obtained should be kept or if the new roles will replace the old roles"
+        }
+    },
+    "lock": {
+        "Set": {
+            "desc": "Set a lock in the specified channels",
+            "usage": "set [channel]*va",
+            "returns": "A confirmation panel that, once confirmed, will lock the specified channels",
+            "aliases": [
+                "lk",
+                "apply",
+                "create"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "`[#channel]` must be a tagged channel. Multiple channels may be specified by separating the tags with a comma. After confirmation, UconnSmashBot will no longer respond to any commands invoked in those channels. If `[#channel]` is \"all\", UconnSmashBot will lock all channels except for the current channel"
+        },
+        "List": {
+            "desc": "List all locked and explicitly unlocked channels",
+            "usage": "list (flag)",
+            "returns": "A list of all channels that are locked or explicitly unlocked",
+            "aliases": [
+                "ls",
+                "show"
+            ],
+            "note": "Valid `(flag)` are \"lock\", \"unlock\", or \"all\""
+        },
+        "Unlock": {
+            "desc": "Unlocks a locked channel",
+            "usage": "unlock [#channel]*va",
+            "returns": "A confirmation panel that, once confirmed, will unlock the specified channels",
+            "aliases": [
+                "ulk",
+                "remove",
+                "delete"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "`[#channel]` must be channel tags. Multiple channels may be specified by separating the tags with a comma. After confirmation, UconnSmashBot will respond in the specified channels. If `[#channel]` is \"all\", UconnSmashBot will unlock all locked channels"
+        }
+    },
+    "logging": {
+        "Set": {
+            "desc": "Set the logging channel to the specified channel",
+            "usage": "set [#channel]",
+            "returns": "An embed that confirms that you have successfully set the logging channel",
+            "aliases": [
+                "use"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "`[#channel]` should be a channel tag or channel ID"
+        },
+        "Command": {
+            "desc": "Toggles logging on and off for a command",
+            "usage": "command [command]",
+            "returns": "An embed that confirms that you have successfully toggled logging status for the specified command",
+            "aliases": [
+                "toggle",
+                "cmd"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "`[command]` must be a command's name, not an alias"
+        },
+        "List": {
+            "desc": "Displays the current logging channel and logging level",
+            "usage": "list (command)",
+            "returns": "An embed that displays the current logging channel and logging level, if set",
+            "aliases": [
+                "show",
+                "display",
+                "ls"
+            ],
+            "note": "An error message will be returned if no logging channel is set. If `(command)` is specified, it will display the logging status for that command given the specified name is valid"
+        },
+        "Disable": {
+            "desc": "Disable logging",
+            "usage": "disable",
+            "returns": "A confirmation panel that, once confirmed, will disable logging on this server",
+            "aliases": [
+                "delete",
+                "reset",
+                "clear",
+                "remove"
+            ],
+            "uperms": [
+                "Manage Server"
+            ]
+        },
+        "Level": {
+            "desc": "Change the server's logging level",
+            "usage": "level [level]",
+            "returns": "An embed that confirms the server's logging level has been changed",
+            "aliases": [
+                "lvl",
+                "levels"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "`[level]` may be either \"basic\", \"server\", or \"hidef\""
+        },
+        "Blacklist": {
+            "desc": "Blacklist a server from using leveling",
+            "usage": "blacklist (guild_id)",
+            "returns": "An embed that confirms that the specified guild has been blacklisted",
+            "aliases": [
+                "bl"
+            ],
+            "uperms": [
+                "Bot Owner Only"
+            ],
+            "note": "If `(guild_id)` is unspecified, it defaults to the current server"
+        }
+    },
+    "playlist": {
+        "Help": {
+            "desc": "Shows help for `playlist` subcommands",
+            "usage": "help",
+            "returns": "An embed with detailed help information for `playlist` subcommands",
+            "aliases": [
+                "h"
+            ]
+        },
+        "List": {
+            "desc": "Lists all your created playlists",
+            "usage": "list",
+            "returns": "A paginated list of all your created playlists",
+            "aliases": [
+                "ls"
+            ]
+        },
+        "Queue": {
+            "desc": "Queues a playlist",
+            "usage": "queue [name | id]",
+            "returns": "A message which details if the playlist queued successfully",
+            "aliases": [
+                "q"
+            ],
+            "note": "Playlist names and IDs can be found by executing the `list` subcommand"
+        },
+        "Play": {
+            "desc": "Plays a playlist",
+            "usage": "play (name | id)",
+            "returns": "A message which details if the playlist queued or is playing",
+            "aliases": [
+                "p"
+            ],
+            "note": "If `(name | id)` is not specified, this command acts like the normal `play` command"
+        },
+        "Save": {
+            "desc": "Save a playlist",
+            "usage": "save (urls)",
+            "returns": "An interactive panel which guides you through the playlist saving process",
+            "aliases": [
+                "s"
+            ],
+            "note": "Individual URLs should be separated by a whitespace if provided, otherwise, it will save the current queue, excluding the currently playing track"
+        },
+        "Append": {
+            "desc": "Appends tracks to a playlist",
+            "usage": "append [id] (urls)",
+            "returns": "An interactive panel which guides you through appending songs to the specified playlist",
+            "aliases": [
+                "add",
+                "a"
+            ],
+            "note": "`(urls)` should be a list of comma separated URLs, otherwise it will save the current queue, excluding the currently playing track. Appending WILL NOT overwrite any URLs currently saved. Instead, they will add them along to the URLs saved in your playlist already. If a URL already exists, it will not be added twice."
+        },
+        "Replace": {
+            "desc": "Replaces tracks in a playlist",
+            "usage": "replace [id] (urls)",
+            "returns": "An interactive panel which guides you through replacing the songs in the specified playlist",
+            "aliaes": [
+                "repl",
+                "rp"
+            ],
+            "note": "`(urls)` should be a list of comma separated URLs, otherwise it will save the current queue, excluding the currently playing track. Replacing WILL overwrite any URLs currently saved. After replacement, your playlist will only contain the songs you have specified during the interactive replacement prompt."
+        },
+        "Rename": {
+            "desc": "Renames a playlist",
+            "usage": "rename [id] [new_name]",
+            "returns": "A confirmation panel which, once confirmed, will rename the specified playlist",
+            "aliases": [
+                "ren",
+                "rn"
+            ],
+            "note": "You will not be able to rename a playlist using a name that already exists (case sensitive)"
+        },
+        "Delete": {
+            "desc": "Deletes a playlist",
+            "usage": "delete [name | id]",
+            "returns": "A confirmation panel that, once confirmed, will delete the specified playlist",
+            "aliases": [
+                "del",
+                "d"
+            ],
+            "note": "This operation is destructive and cannot be undone"
+        }
+    },
+    "git": {
+        "Git Pull Origin Development": {
+            "desc": "Pulls from UconnSmashBot's development branch",
+            "usage": "gpod",
+            "returns": "An embed detailing the pull status",
+            "uperms": [
+                "Bot Owner Only"
+            ]
+        },
+        "Git Pull Origin Master": {
+            "desc": "Pulls from UconnSmashBot's master branch",
+            "usage": "gpom",
+            "returns": "An embed detailing the pull status",
+            "uperms": [
+                "Bot Owner Only"
+            ]
+        }
+    },
+    "balanceadmin": {
+        "Set": {
+            "desc": "Sets a user's balance",
+            "usage": "set [@user] [amount]",
+            "returns": "An embed confirming the balance has been updated",
+            "uperms": [
+                "Bot Owner Only"
+            ]
+        },
+        "Give": {
+            "desc": "Gives a user additional credits",
+            "usage": "give [@user] [amount]",
+            "returns": "An embed confirming the balance has been updated",
+            "uperms": [
+                "Bot Owner Only"
+            ]
+        },
+        "Remove": {
+            "desc": "Removes credits from a user's balance",
+            "usage": "remove [@user] [amount]",
+            "returns": "An embed confirming the balance has been updated",
+            "uperms": [
+                "Bot Owner Only"
+            ]
+        }
+    },
+    "blacklist": {
+        "User": {
+            "desc": "Blacklists a user from using UconnSmashBot",
+            "usage": "user [op] [@user]",
+            "returns": "An embed confirming the user's blacklist status has been updated",
+            "aliases": [
+                "member"
+            ],
+            "uperms": [
+                "Bot Owner Only"
+            ]
+        },
+        "Guild": {
+            "desc": "Blacklists a guild from using UconnSmashBot",
+            "usage": "guild [op] [guild_id]",
+            "returns": "An embed confirming the guild's blacklist status has been updated",
+            "aliases": [
+                "server"
+            ],
+            "uperms": [
+                "Bot Owner Only"
+            ]
+        }
+    },
+    "premium": {
+        "Set User": {
+            "desc": "Sets a user's UconnSmashBot premium status",
+            "usage": "set user [@user] (status)",
+            "returns": "An embed confirming the user's premium status has been updated",
+            "uperms": [
+                "Bot Owner Only"
+            ],
+            "note": "`(status)` must be either \"true\" or \"false\". If unspecified, defaults to \"false\""
+        },
+        "Set Guild": {
+            "desc": "Sets the current guild's UconnSmashBot premium status",
+            "usage": "set guild (status)",
+            "returns": "An embed confirming the guild's premium status has been updated",
+            "uperms": [
+                "Bot Owner Only"
+            ],
+            "note": "`(status)` must be either \"true\" or \"false\". If unspecified, defaults to \"false\""
+        },
+        "List User": {
+            "desc": "Lists all premium users",
+            "usage": "list user (source)",
+            "returns": "A paginated embed that lists all premium users",
+            "uperms": [
+                "Bot Owner Only"
+            ],
+            "note": "`(source)` must be either \"guild\" or \"global\". If unspecified, defaults to \"global\""
+        },
+        "List Guild": {
+            "desc": "Lists all premium guilds",
+            "usage": "list guild (source)",
+            "returns": "A paginated embed that lists all premium guilds",
+            "uperms": [
+                "Bot Owner Only"
+            ],
+            "note": "`(source)` must be either \"guild\" or \"global\". If unspecified, defaults to \"global\""
+        }
+    },
+    "pokedex": {
+        "Pokémon": {
+            "desc": "Retrieves a pokédex entry for a Pokémon",
+            "usage": "pokemon [name]",
+            "returns": "Details about the specified Pokémon",
+            "aliases": [
+                "p"
+            ]
+        },
+        "Move": {
+            "desc": "Retrieves info about a move",
+            "usage": "move [name]",
+            "returns": "Details about the move",
+            "aliases": [
+                "moves",
+                "m"
+            ]
+        },
+        "Ability": {
+            "desc": "Retrieves info about an ability",
+            "usage": "ability [name] (flag)",
+            "returns": "Details about the specified ability",
+            "aliases": [
+                "a"
+            ],
+            "note": "`(flag)` may be either \"-en\" for English or \"-de\" for German. If `(flag)` is unspecified, it defaults to \"-en\""
+        },
+        "Item": {
+            "desc": "Retrieves info about an item",
+            "usage": "item [name]",
+            "returns": "Details about the specified item",
+            "aliases": [
+                "i"
+            ]
+        },
+        "Type": {
+            "desc": "Retrieves info about a type",
+            "usage": "type [type] (flag)",
+            "returns": "Details about the specified type",
+            "aliases": [
+                "t"
+            ],
+            "note": "`(flag)` defaults to None if unspecified. Valid flags are \"-p\" to display all pokemon of the specified type, or \"-m\" to display all moves of the speicifed type"
+        }
+    },
+    "redirect": {
+        "Set": {
+            "desc": "Sets a redirect",
+            "usage": "set [#channel] [command]*va",
+            "returns": "A confirmation panel that, once confirmed, will configure the redirect for the specified channels",
+            "aliases": [
+                "apply"
+            ],
+            "note": "`[command]*va` may be a list of comma separated commands, or \"all\" to set redirects for all commands"
+        },
+        "List": {
+            "desc": "Lists all redirects",
+            "usage": "list (#channel)",
+            "returns": "A list of all the redirects this server implements",
+            "aliases": [
+                "ls",
+                "show"
+            ],
+            "note": "If `(#channel)` is specified, it will display the redirect implemented for the specified channel"
+        },
+        "Remove": {
+            "desc": "Removes a redirect",
+            "usage": "remove [command]*va",
+            "returns": "A confirmation panel that, once confirmed, will remove the redirect for the specified channels",
+            "aliases": [
+                "rm",
+                "del",
+                "delete"
+            ],
+            "note": "`[command]*va` may be a list of comma separated commands, or \"all\" to remove all redirects for all commands"
+        }
+    },
+    "remind": {
+        "Create": {
+            "desc": "Creates a reminder",
+            "usage": "[message]",
+            "returns": "An interactive setup panel that configures the reminder dispatch time and behavior",
+            "aliases": [
+                "reminder"
+            ]
+        },
+        "List": {
+            "desc": "Lists all reminders",
+            "usage": "list",
+            "returns": "A paginated embed containing all active reminders in the current channel",
+            "aliases": [
+                "show"
+            ]
+        },
+        "Edit": {
+            "desc": "Edits a reminder",
+            "usage": "edit [id]",
+            "returns": "An interactive reminder edit panel",
+            "aliases": [
+                "modify"
+            ]
+        },
+        "Delete": {
+            "desc": "Deletes a reminder",
+            "usage": "delete [id]",
+            "returns": "A confirmation panel that, once confirmed, will delete your reminder and stop its scheduled dispatch",
+            "aliases": [
+                "del",
+                "remove"
+            ]
+        }
+    },
+    "autoroles": {
+        "Set": {
+            "desc": "Sets an autorole for users or bots",
+            "usage": "[user | bot] set [@role]*va",
+            "returns": "A confirmation embed with the list of roles that will be automatically given upon joining the server",
+            "aliases": null,
+            "uperms": [
+                "Manage Roles"
+            ],
+            "bperms": [
+                "Manage Server"
+            ]
+        },
+        "Remove": {
+            "desc": "Removes an autorole for users or bots",
+            "usage": "[user | bot] remove [@role]*va",
+            "returns": "A confirmation embed with the list of roles that will no longer be automatically given upon joining the server",
+            "aliases": [
+                "rm",
+                "del",
+                "delete"
+            ],
+            "uperms": [
+                "Manage Roles"
+            ],
+            "bperms": [
+                "Manage Server"
+            ]
+        },
+        "List": {
+            "desc": "Lists all autoroles",
+            "usage": "list (user | bot)",
+            "returns": "A paginated embed that details any active autoroles for the specified groups",
+            "aliases": [
+                "ls",
+                "show"
+            ],
+            "note": "If `(user | bot)` is unspecified, it will display all active autoroles"
+        }
+    },
+    "reactionroles": {
+        "Create": {
+            "desc": "Creates a reactionroles panel",
+            "usage": "create",
+            "returns": "An interactive reactionroles setup panel",
+            "aliases": [
+                "start",
+                "make"
+            ],
+            "uperms": [
+                "Manage Roles",
+                "Add Reactions"
+            ],
+            "bperms": [
+                "Manage Server"
+            ],
+            "note": "[Click Here](https://www.google.com/search?q=color+picker) for a useful hex color picker"
+        },
+        "Edit": {
+            "desc": "Edits a reactionroles panel",
+            "usage": "edit [#channel] [message_id]",
+            "returns": "An interactive reactionroles edit panel",
+            "aliases": [
+                "adjust"
+            ],
+            "uperms": [
+                "Manage Roles",
+                "Add Reactions"
+            ],
+            "bperms": [
+                "Manage Server"
+            ]
+        },
+        "Delete": {
+            "desc": "Deletes a reactionroles panel",
+            "usage": "delete [message_id]",
+            "returns": "A confirmation embed that, once confirmed, will delete the specified reactionroles panel",
+            "aliases": [
+                "del",
+                "rm"
+            ],
+            "uperms": [
+                "Manage Roles",
+                "Add Reactions"
+            ],
+            "bperms": [
+                "Manage Server"
+            ]
+        },
+        "Clear": {
+            "desc": "Deletes all reactionroles panels",
+            "usage": "clear",
+            "returns": "A confirmation embed that, once confirmed, will delete all reactionroles panels in the current server",
+            "aliases": [
+                "wipe"
+            ],
+            "uperms": [
+                "Server Owner Only"
+            ],
+            "note": "This will not delete the physical messages, only the database entries"
+        }
+    },
+    "serverlink": {
+        "About": {
+            "desc": "Displays information about UconnSmashBot's ServerLink feature",
+            "usage": "about",
+            "returns": "Information about UconnSmashBot's ServerLink feature"
+        },
+        "Register": {
+            "desc": "Registers a ServerLink channel",
+            "usage": "register [#channel]",
+            "returns": "An embed that confirms the channel was successfully registered to ServerLink",
+            "aliases": [
+                "set",
+                "enable"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "You may not re-register an already registered channel"
+        },
+        "Unregister": {
+            "desc": "Unregisters a ServerLink channel",
+            "usage": "unregister [#channel]",
+            "returns": "An embed that confirms the channel was successfully unregistered from ServerLink",
+            "aliases": [
+                "unset",
+                "disable"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "You may only unregister channels that are currently registered"
+        },
+        "Public": {
+            "desc": "Sets a ServerLink channel as a publically discoverable channel",
+            "usage": "public [#channel]",
+            "returns": "A confirmation panel that, once confirmed, will allow UconnSmashBot to display your channel on its public ServerLink listings",
+            "aliases": [
+                "pub"
+            ],
+            "uperms": [
+                "Manage Server"
+            ]
+        },
+        "Unpublic": {
+            "desc": "Sets a ServerLink channel as a non-publically discoverable channel",
+            "usage": "unpublic [#channel]",
+            "returns": "A confirmation panel that, once confirmed, will remove the specified channel from UconnSmashBot's public ServerLink listings",
+            "aliases": [
+                "unpub",
+                "private"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "`[#channel]` must be a registered public ServerLink channel"
+        },
+        "Listings": {
+            "desc": "Displays public ServerLink channels",
+            "usage": "listings",
+            "returns": "A paginated embed that lists all public ServerLink channels",
+            "aliases": [
+                "global"
+            ],
+            "note": "In order to appear on the listings, you must make your registered ServerLink channel public"
+        },
+        "List": {
+            "desc": "Lists all registered ServerLink channels in the current server",
+            "usage": "list",
+            "returns": "An embed that lists all currently registered ServerLink channels in the current server",
+            "aliases": [
+                "ls",
+                "show"
+            ]
+        },
+        "Request": {
+            "desc": "Sends a request to another ServerLink channel",
+            "usage": "request [server]",
+            "returns": "An embed that confirms the status of your request",
+            "aliases": [
+                "req"
+            ],
+            "note": "`[server]` may be the name or ID of a server that has a registered public ServerLink channel"
+        },
+        "Accept": {
+            "desc": "Accepts a pending ServerLink request",
+            "usage": "accept [id]",
+            "returns": "An initiated ServerLink session between your server and the requester's server",
+            "aliases": [
+                "allow"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "`[id]` is provided in the request message. Requests are valid up to one hour from when it was originally sent"
+        },
+        "Deny": {
+            "desc": "Denies a pending ServerLink request",
+            "usage": "deny [id]",
+            "returns": "An embed confirming that you have denied the ServerLink request",
+            "aliases": [
+                "reject"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "`[id]` is provided in the request message. Requests are valid up to one hour from when it was originally sent"
+        },
+        "Disconnect": {
+            "desc": "Disconnects a currently connected ServerLink session",
+            "usage": "disconnect",
+            "returns": "An embed that confirms you have successfully disconnected the active ServerLink session",
+            "aliases": [
+                "dc",
+                "end"
+            ],
+            "note": "You may only disconnect if the channel you invoked the command from is currently connected to an active ServerLink session"
+        },
+        "Block": {
+            "desc": "Blocks a server from sending ServerLink requests",
+            "usage": "block [server]",
+            "returns": "A confirmation panel that, once confirmed, will prevent your server from receiving ServerLink requests from the specified server",
+            "aliases": [
+                "b"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "`[server]` may be the name or ID of a server"
+        },
+        "Unblock": {
+            "desc": "Unblocks a server, allowing you to receive ServerLink requests from it again",
+            "usage": "unblock [server]",
+            "returns": "A confirmation panel that, once confirmed, will allow your server to receive ServerLink requests from the specified server",
+            "aliases": [
+                "ub"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "`[server]` may be the name or ID of a server. If `[server]` is unspecified, it will unblock all currently blocked servers"
+        }
+    },
+    "starboard": {
+        "Register": {
+            "desc": "Registers a channel as a starboard channel",
+            "usage": "register",
+            "returns": "An interactive setup panel that will register a channel and emoji binding for a starboard channel",
+            "aliases": [
+                "reg",
+                "create"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "You may invoke this command multiple times to register different channel and emoji pairs. This will register multiple starboard channels"
+        },
+        "Unregister": {
+            "desc": "Unregisters a currently registered starboard channel",
+            "usage": "unregister [#channel]",
+            "returns": "An embed that confirms the starboard at the specified channel and its emoji binding have been unregistered",
+            "aliases": [
+                "unreg",
+                "remove"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "Unbinding an emoji effectively disables starboard for that emoji"
+        },
+        "List": {
+            "desc": "Lists details for all active starboard channels",
+            "usage": "list",
+            "returns": "An embed displaying the details of your currently active starboards in the current server",
+            "aliases": [
+                "ls",
+                "show"
+            ]
+        }
+    },
+    "suggestions": {
+        "Bind Channel": {
+            "desc": "Binds a channel as the suggestions channel",
+            "usage": "bind channel [#channel]",
+            "returns": "An embed that confirms the suggestions channel has been bound to the specified channel",
+            "aliases": [
+                "register",
+                "set"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "Aliases apply only for the `bind` portion of the command. Only one channel may be bound at a time. UconnSmashBot must have permission to send messages in the specified channel"
+        },
+        "Bind Emoji": {
+            "desc": "Binds the emoji to use for upvoting messages to the suggestions channel",
+            "usage": "bind emoji",
+            "returns": "A reaction panel that, once reacted to, sets the reaction emoji to be used to trigger a suggestions entry",
+            "aliases": [
+                "register",
+                "set"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "Aliases apply only for the `bind` portion of the command. Only one emoji may be bound at a time"
+        },
+        "Unbind Channel": {
+            "desc": "Unbinds a currently bound suggestions channel, effectively disabling suggestions",
+            "usage": "unbind channel",
+            "returns": "An embed that confirms the curerntly set suggestions channel has been unbound",
+            "aliases": [
+                "unregister",
+                "unset"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "Aliases apply only for the `unbind` portion of the command. You may only unbind a channel if one is currently bound"
+        },
+        "Unbind Emoji": {
+            "desc": "Unbinds a currently bound emoji used for suggestions, effectively disabling it",
+            "usage": "unbind emoji",
+            "returns": "An embed that confirms the currently bound suggestions emoji has been unbound",
+            "aliases": [
+                "unregister",
+                "unset"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "Aliases apply only for the `unbind` portion of the command. You may only unbind a channel if one is currently bound"
+        },
+        "Set Threshold": {
+            "desc": "Sets the reaction threshold for a message to be pushed to the suggestions channel",
+            "usage": "threshold set [value]",
+            "returns": "An embed that confirms the current reaction threshold has been set",
+            "aliases": [
+                "count"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "Aliases apply only for the `threshold` portion of the command. `[value]` should be a non-zero positive integer value"
+        },
+        "Reset Threshold": {
+            "desc": "Resets the reaction threshold to use the default formula",
+            "usage": "threshold reset",
+            "returns": "An embed that confirms the current reaciton threshold has been rest to follow the default formula",
+            "aliases": [
+                "count"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "Aliases apply only for the `threshold` portion of the command"
+        },
+        "Enable": {
+            "desc": "Enables the suggestions feature",
+            "usage": "enable",
+            "returns": "An embed that confirms the suggestions feature has been enabled",
+            "aliases": [
+                "start"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "Once a channel and emoji are bound, it is enabled by default. This command should be used to *reenable* this feature after it has been disabled"
+        },
+        "Disable": {
+            "desc": "Disables the suggestions feature",
+            "usage": "disable",
+            "returns": "An embed that confirms the suggestions feature has been disabled",
+            "aliases": [
+                "stop"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "If either a channel or emoji are unbound, this feature will effectively be disabled. This command should be used to disable the feature, while preserving bound settings"
+        }
+    },
+    "tag": {
+        "List": {
+            "desc": "Lists all tags",
+            "usage": "list",
+            "returns": "A list of all tags you own, if any"
+        },
+        "Search": {
+            "desc": "Searches for a tag",
+            "usage": "search [query]",
+            "returns": "A list of the top 20 tags that contain the query substring in the order of most used"
+        },
+        "Create": {
+            "desc": "Creates a tag",
+            "usage": "create [name]",
+            "returns": "An interactive tag creation panel",
+            "aliases": [
+                "make"
+            ],
+            "note": "If the tag `[name]` already exists and you own it, you may choose to edit or delete it"
+        },
+        "Edit": {
+            "desc": "Edits a tag",
+            "usage": "edit [name]",
+            "returns": "An interactive tag edit panel",
+            "note": "If the tag does not exist, you will have the option to create it. You may only edit tags you own"
+        },
+        "Delete": {
+            "desc": "Deletes a tag",
+            "usage": "delete [name]",
+            "returns": "An interactive tag delete confirmation panel",
+            "aliases": [
+                "remove"
+            ],
+            "note": "You must own the specified tag in order to delete it"
+        }
+    },
+    "todo": {
+        "Create": {
+            "desc": "Creates an item to be added to your todo list",
+            "usage": "create [item]",
+            "returns": "An embed that confirms your todo was successfully created or added to your current todo list",
+            "aliases": [
+                "add"
+            ]
+        },
+        "Edit": {
+            "desc": "Edits a todo list entry",
+            "usage": "edit [id]",
+            "returns": "An interactive panel that will guide you through editing the specified todo",
+            "aliases": [
+                "modify",
+                "adjust"
+            ],
+            "note": "You may only edit todos you own"
+        },
+        "List": {
+            "desc": "Lists your todos",
+            "usage": "list (flag)",
+            "returns": "A paginated list of all your active and completed todos",
+            "aliases": [
+                "show"
+            ],
+            "note": "`(flag)` may be either \"active\" to show active todos, or \"done\" / \"complete\" to show finished todos"
+        },
+        "Complete": {
+            "desc": "Marks a todo as complete",
+            "usage": "complete [id]*va",
+            "returns": "An embed that confirms your todo was marked as complete",
+            "aliases": [
+                "finish",
+                "done"
+            ],
+            "note": "If `[id]` is \"all\", all currently active todos will be marked as completed. Marking a todo as complete does not equate to deleting it"
+        },
+        "Reset": {
+            "desc": "Resets todos and returns them to an active state",
+            "usage": "reset [id]*va",
+            "returns": "An embed that confirms your todo was successfully reset, or marked as active",
+            "aliases": [
+                "incomplete"
+            ]
+        },
+        "Remove": {
+            "desc": "Removes a todo from your todo list",
+            "usage": "remove [id]*va",
+            "returns": "A confirmation embed that, once confirmed, will remove the specified todos from your todo list",
+            "aliases": [
+                "rm",
+                "delete",
+                "del"
+            ],
+            "note": "Removing a todo from your todo list permanently deletes that item. You will not be able to access it again after you delete it"
+        }
+    },
+    "triggers": {
+        "Help": {
+            "desc": "Shows subcommand help for `triggers`",
+            "usage": "help",
+            "returns": "An embed with detailed help information for `triggers` subcommands",
+            "aliases": [
+                "h"
+            ],
+            "note": "The help panel will be returned on an invalid or no subcommand invocation"
+        },
+        "List": {
+            "desc": "Lists all active triggers in the current server",
+            "usage": "list (trigger)",
+            "returns": "An embed with information for the triggers in the current server",
+            "aliases": [
+                "ls"
+            ],
+            "note": "If `(trigger)` is specified, it will return detailed information for that trigger if it exists in the current server"
+        },
+        "Create": {
+            "desc": "Creates a trigger",
+            "usage": "create [word | phrase]",
+            "returns": "An interactive panel that will guide you through creating a trigger",
+            "aliases": [
+                "c",
+                "make"
+            ],
+            "note": "All created triggers are active on a server scope, meaning that a trigger created in channel A will be active in all other channels as well"
+        },
+        "Edit": {
+            "desc": "Edits a trigger",
+            "usage": "edit [trigger]",
+            "returns": "An interactive panel that will guide you through editing a trigger",
+            "aliases": [
+                "e",
+                "modify"
+            ],
+            "note": "You may only edit triggers you have created"
+        },
+        "Delete": {
+            "desc": "Deletes a trigger",
+            "usage": "delete [trigger]",
+            "returns": "A confirmation panel that, once confirmed, will delete the specified trigger",
+            "aliases": [
+                "del",
+                "remove"
+            ],
+            "note": "You may only delete triggers you have created"
+        },
+        "Activate": {
+            "desc": "Activates a trigger",
+            "usage": "activate [trigger]",
+            "returns": "A confirmation message that details trigger activation status",
+            "aliases": [
+                "ac",
+                "enable"
+            ],
+            "note": "You may only activate triggers you own. `[trigger]` may be \"all\" to activate all triggers. Created triggers are active by default"
+        },
+        "Deactivate": {
+            "desc": "Deactivates a trigger",
+            "usage": "deactivate [trigger]",
+            "returns": "A confirmation message that details trigger activation status",
+            "aliases": [
+                "deac",
+                "disable"
+            ],
+            "note": "You may only deactivate triggers you own. `[trigger]` may be \"all\" to deactivate all triggers. Created triggers are active by default"
+        },
+        "Purge": {
+            "desc": "Deletes all triggers from the current server",
+            "usage": "purge (@member)",
+            "returns": "A confirmation panel that, once confirmed, will delete the specified triggers",
+            "aliases": [
+                "p"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "If `(@member)` is specified, all triggers created by the specified member will be deleted. Otherwise, it deletes all triggers in the current server"
+        }
+    },
+    "request": {
+        "Feature": {
+            "desc": "Requests a feature to add to UconnSmashBot",
+            "usage": "feature [message]",
+            "returns": "An embed that confirms your feature request has been sent"
+        },
+        "Reply": {
+            "desc": "Replies to a feature request",
+            "usage": "reply [message_id] [message]",
+            "returns": "An embed that confirms your reply has been sent",
+            "uperms": [
+                "Bot Owner Only"
+            ],
+            "note": "`[message_id]` will be provided in the feature request embed"
+        }
+    },
+    "welcomer": {
+        "Create": {
+            "desc": "Creates a welcomer",
+            "usage": "create",
+            "returns": "An interactive setup panel that will create a welcomer in your server",
+            "aliases": [
+                "make",
+                "start"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "You will be unable to use this command if you already have a welcomer set up. If you try to use this command when you already have a welcomer set up, it will automatically redirect you to the interactive edit panel"
+        },
+        "Edit": {
+            "desc": "Edits a welcomer",
+            "usage": "edit",
+            "returns": "An interactive setup panel that will edit your current welcomer",
+            "aliases": [
+                "adjust",
+                "modify"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "You must have a welcomer currently set up in this server to use this command"
+        },
+        "Delete": {
+            "desc": "Deletes a welcomer",
+            "usage": "delete",
+            "returns": "A confirmation panel that, once confirmed, will delete your welcomer if it exists",
+            "aliases": [
+                "del",
+                "trash"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "You must have a welcomer currently set up in this server to use this command"
+        },
+        "Test": {
+            "desc": "Tests your welcomer",
+            "usage": "test",
+            "returns": "A test welcomer in your currently set welcomer channel",
+            "uperms": [
+                "Manage Server"
+            ]
+        }
+    },
+    "leaver": {
+        "Create": {
+            "desc": "Creates a leaver",
+            "usage": "create",
+            "returns": "An embed that details the status of the leaver creation",
+            "aliases": [
+                "make",
+                "start"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "Leavers may only be created when a welcomer is active in the server"
+        },
+        "Delete": {
+            "desc": "Deletes a leaver",
+            "usage": "delete",
+            "returns": "An embed that details the status of the leaver deletion",
+            "aliases": [
+                "del",
+                "trash"
+            ],
+            "uperms": [
+                "Manage Server"
+            ],
+            "note": "Leavers may only be deleted when a welcomer and leaver are both set up"
+        },
+        "Test": {
+            "desc": "Tests a leaver",
+            "usage": "test",
+            "returns": "A test leaver in your currently set welcomer channel",
+            "uperms": [
+                "Manage Server"
+            ]
+        }
+    }
+}
