@@ -77,7 +77,7 @@ async def run(uptime):
     description = "A MarwynnBot port for the University of Connecticut's Super Smash Bros. club."
     startup = discord.Activity(name="Starting Up...", type=discord.ActivityType.playing)
     intents = discord.Intents.all()
-    bot = Bot(command_prefix=get_prefix, help_command=None, shard_count=1, description=description, db=db,
+    bot = Bot(command_prefix=get_prefix, help_command=None, shard_count=1, description=description, db=db, mbdb=mbdb,
               fetch_offline_members=True, status=discord.Status.online, activity=startup, uptime=uptime,
               intents=intents, owner_id=int(os.getenv("OWNER_ID")))
 
